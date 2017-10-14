@@ -72,7 +72,9 @@ open class ProgressWebViewController: UIViewController {
     
     deinit {
         webView.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
-        webView.removeObserver(self, forKeyPath: titleKeyPath)
+        if websiteTitleInNavigationBar {
+            webView.removeObserver(self, forKeyPath: titleKeyPath)
+        }
     }
     
     override open func loadView() {
