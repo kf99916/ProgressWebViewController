@@ -26,17 +26,34 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
-    lazy fileprivate var barButtonItemMapping: [BarButtonItemType: UIBarButtonItem] = {
+    lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
-        
-        return [
-            .back: UIBarButtonItem(image: UIImage(named: "Back", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(backDidClick(sender:))),
-            .forward: UIBarButtonItem(image: UIImage(named: "Forward", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(forwardDidClick(sender:))),
-            .reload: UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadDidClick(sender:))),
-            .activity: UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(activityDidClick(sender:))),
-            .done: UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:))),
-            .flexibleSpace: UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-            ]
+        return UIBarButtonItem(image: UIImage(named: "Back", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(backDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var forwardBarButtonItem: UIBarButtonItem = {
+        let bundle = Bundle(for: ProgressWebViewController.self)
+        return UIBarButtonItem(image: UIImage(named: "Forward", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(forwardDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var reloadBarButtonItem: UIBarButtonItem = {
+        return UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var stopBarButtonItem: UIBarButtonItem = {
+        return UIBarButtonItem(barButtonSystemItem: .stop, target: self, action: #selector(stopDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var activityBarButtonItem: UIBarButtonItem = {
+        return UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(activityDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var doneBarButtonItem: UIBarButtonItem = {
+        return UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:)))
+    }()
+    
+    lazy fileprivate var flexibleSpaceBarButtonItem: UIBarButtonItem = {
+        return UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     }()
     
     deinit {
@@ -131,6 +148,16 @@ fileprivate extension ProgressWebViewController {
     }
     
     func addBarButtonItems() {
+        let barButtonItems: [BarButtonItemType: UIBarButtonItem] = [
+            .back: backBarButtonItem,
+            .forward: forwardBarButtonItem,
+            .reload: reloadBarButtonItem,
+            .stop: stopBarButtonItem,
+            .activity: activityBarButtonItem,
+            .done: doneBarButtonItem,
+            .flexibleSpace: flexibleSpaceBarButtonItem
+        ]
+        
         if presentingViewController != nil {
             switch doneBarButtonItemPosition {
             case .left:
@@ -145,10 +172,10 @@ fileprivate extension ProgressWebViewController {
                 break
             }
         }
-
+        
         navigationItem.leftBarButtonItems = leftNavigaionBarItemTypes.map {
             barButtonItemType in
-            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+            if let barButtonItem = barButtonItems[barButtonItemType] {
                 return barButtonItem
             }
             return UIBarButtonItem()
@@ -156,24 +183,56 @@ fileprivate extension ProgressWebViewController {
         
         navigationItem.rightBarButtonItems = rightNavigaionBarItemTypes.map {
             barButtonItemType in
-            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+            if let barButtonItem = barButtonItems[barButtonItemType] {
                 return barButtonItem
             }
             return UIBarButtonItem()
         }
         
-        var itemTypes = toolbarItemTypes
-        for index in 0..<itemTypes.count - 1 {
-            itemTypes.insert(.flexibleSpace, at: 2 * index + 1)
+        for index in 0..<toolbarItemTypes.count - 1 {
+            toolbarItemTypes.insert(.flexibleSpace, at: 2 * index + 1)
         }
         
-        setToolbarItems(itemTypes.map {
+        setToolbarItems(toolbarItemTypes.map {
             barButtonItemType -> UIBarButtonItem in
-            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+            if let barButtonItem = barButtonItems[barButtonItemType] {
                 return barButtonItem
             }
             return UIBarButtonItem()
         }, animated: true)
+    }
+    
+    func updateBarButtonItems() {
+        backBarButtonItem.isEnabled = webView.canGoBack
+        forwardBarButtonItem.isEnabled = webView.canGoForward
+        
+        let updateReloadBarButtonItem: (UIBarButtonItem, Bool) -> UIBarButtonItem = {
+            [unowned self] barButtonItem, isLoading in
+            switch barButtonItem {
+            case self.reloadBarButtonItem:
+                fallthrough
+            case self.stopBarButtonItem:
+                    return isLoading ? self.stopBarButtonItem : self.reloadBarButtonItem
+            default:
+                break
+            }
+            return barButtonItem
+        }
+        
+        toolbarItems = toolbarItems?.map {
+            [unowned self] barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+        }
+        
+        navigationItem.leftBarButtonItems = navigationItem.leftBarButtonItems?.map {
+            [unowned self] barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+        }
+        
+        navigationItem.rightBarButtonItems = navigationItem.rightBarButtonItems?.map {
+            [unowned self] barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+        }
     }
     
     func setUpState() {
@@ -212,6 +271,10 @@ fileprivate extension ProgressWebViewController {
         webView.reload()
     }
     
+    @objc func stopDidClick(sender: AnyObject) {
+        webView.stopLoading()
+    }
+    
     @objc func activityDidClick(sender: AnyObject) {
         guard let url = url else {
             return
@@ -233,5 +296,18 @@ extension ProgressWebViewController: WKUIDelegate {
 
 // MARK: - WKNavigationDelegate
 extension ProgressWebViewController: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        updateBarButtonItems()
+    }
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        updateBarButtonItems()
+    }
     
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        updateBarButtonItems()
+    }
+    
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        updateBarButtonItems()
+    }
 }
