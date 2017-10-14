@@ -8,6 +8,11 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 
 ![ProgressWebViewController](/screenshots/progressWebViewController.png "ProgressWebViewController") ![ProgressWebViewController](/screenshots/progressWebViewController2.png "ProgressWebViewController")
 
+## Features
+- :white_check_mark: Progress bar in navigation bar
+- :white_check_mark: Bypass SSL according to the assigned hosts
+- :white_check_mark: Customize bar button items
+
 ## Requirements
 
 - iOS 9.0 or higher
