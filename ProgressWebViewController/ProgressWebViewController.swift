@@ -10,6 +10,7 @@ import UIKit
 import WebKit
 
 let estimatedProgressKeyPath = "estimatedProgress"
+let titleKeyPath = "title"
 
 @objc public protocol ProgressWebViewControllerDelegate {
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool
@@ -27,6 +28,7 @@ open class ProgressWebViewController: UIViewController {
     open var delegate: ProgressWebViewControllerDelegate?
     open var bypassedSSLHosts: [String]?
     
+    open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .left
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
@@ -70,6 +72,7 @@ open class ProgressWebViewController: UIViewController {
     
     deinit {
         webView.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
+        webView.removeObserver(self, forKeyPath: titleKeyPath)
     }
     
     override open func loadView() {
@@ -83,6 +86,9 @@ open class ProgressWebViewController: UIViewController {
         webView.isMultipleTouchEnabled = true
         
         webView.addObserver(self, forKeyPath: estimatedProgressKeyPath, options: .new, context: nil)
+        if websiteTitleInNavigationBar {
+            webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
+        }
         
         view = webView
     }
@@ -128,21 +134,23 @@ open class ProgressWebViewController: UIViewController {
     }
     
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard keyPath == estimatedProgressKeyPath else {
+        switch keyPath {
+        case estimatedProgressKeyPath?:
+            progressView.alpha = 1
+            progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+            
+            if(webView.estimatedProgress >= 1.0) {
+                UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
+                    self.progressView.alpha = 0
+                }, completion: {
+                    finished in
+                    self.progressView.setProgress(0, animated: false)
+                })
+            }
+        case titleKeyPath?:
+            navigationItem.title = webView.title
+        default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            return
-        }
-        
-        progressView.alpha = 1
-        progressView.setProgress(Float(webView.estimatedProgress), animated: true)
-        
-        if(webView.estimatedProgress >= 1.0) {
-            UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
-                self.progressView.alpha = 0
-            }, completion: {
-                finished in
-                self.progressView.setProgress(0, animated: false)
-            })
         }
     }
 }
