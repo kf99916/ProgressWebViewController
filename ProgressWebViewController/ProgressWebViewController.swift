@@ -15,6 +15,7 @@ let estimatedProgressKeyPath = "estimatedProgress"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL) -> Bool
 }
 
 open class ProgressWebViewController: UIViewController {
@@ -339,5 +340,14 @@ extension ProgressWebViewController: WKNavigationDelegate {
         } else {
             completionHandler(.performDefaultHandling, nil)
         }
+    }
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        var actionPolicy: WKNavigationActionPolicy = .allow
+        if let url = webView.url, let result = delegate?.progressWebViewController?(self, decidePolicy: url) {
+            actionPolicy = result ? .allow : .cancel
+        }
+        
+        decisionHandler(actionPolicy)
     }
 }
