@@ -6,8 +6,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 [![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
 [![License](https://img.shields.io/github/license/kf99916/ProgressWebViewController.svg)](LICENSE)
 
-![ProgressWebViewController](/screenshots/progressWebViewController.png "ProgressWebViewController")
-![ProgressWebViewController](/screenshots/progressWebViewController2.png "ProgressWebViewController")
+![ProgressWebViewController](/screenshots/progressWebViewController.png "ProgressWebViewController") ![ProgressWebViewController](/screenshots/progressWebViewController2.png "ProgressWebViewController")
 
 ## Requirements
 
