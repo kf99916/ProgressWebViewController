@@ -22,8 +22,9 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView!
     fileprivate var progressView: UIProgressView!
-    fileprivate var previousNavigationBarHidden = false
-    fileprivate var previousToolbarHidden = false
+    
+    fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
+    fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
     lazy fileprivate var barButtonItemMapping: [BarButtonItemType: UIBarButtonItem] = {
         let bundle = Bundle(for: ProgressWebViewController.self)
@@ -64,8 +65,8 @@ open class ProgressWebViewController: UIViewController {
         navigationItem.title = navigationItem.title ?? url?.absoluteString
         
         if let navigationController = navigationController {
-            previousNavigationBarHidden = navigationController.navigationBar.isHidden
-            previousToolbarHidden = navigationController.toolbar.isHidden
+            previousNavigationBarState = (navigationController.navigationBar.tintColor, navigationController.navigationBar.isHidden)
+            previousToolbarState = (navigationController.toolbar.tintColor, navigationController.toolbar.isHidden)
         }
         
         setUpProgressView()
@@ -83,21 +84,13 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationController?.setNavigationBarHidden(false, animated: true)
-        navigationController?.setToolbarHidden(false, animated: true)
-        
-        navigationController?.navigationBar.isHidden = false
-        navigationController?.toolbar.isHidden = false
-        navigationController?.navigationBar.addSubview(progressView)
+        setUpState()
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        progressView.removeFromSuperview()
-        
-        navigationController?.setToolbarHidden(previousToolbarHidden, animated: true)
-        navigationController?.setNavigationBarHidden(previousNavigationBarHidden, animated: true)
+        rollbackState()
     }
 
     override open func didReceiveMemoryWarning() {
@@ -135,10 +128,6 @@ fileprivate extension ProgressWebViewController {
         progressView = UIProgressView(progressViewStyle: .default)
         progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
-        
-        if let tintColor = tintColor {
-            progressView.progressTintColor = tintColor
-        }
     }
     
     func addBarButtonItems() {
@@ -173,10 +162,6 @@ fileprivate extension ProgressWebViewController {
             return UIBarButtonItem()
         }
         
-        if let tintColor = tintColor {
-            navigationController?.navigationBar.tintColor = tintColor
-        }
-        
         var itemTypes = toolbarItemTypes
         for index in 0..<itemTypes.count - 1 {
             itemTypes.insert(.flexibleSpace, at: 2 * index + 1)
@@ -189,10 +174,29 @@ fileprivate extension ProgressWebViewController {
             }
             return UIBarButtonItem()
         }, animated: true)
-        
+    }
+    
+    func setUpState() {
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.setToolbarHidden(false, animated: true)
+    
         if let tintColor = tintColor {
+            progressView.progressTintColor = tintColor
+            navigationController?.navigationBar.tintColor = tintColor
             navigationController?.toolbar.tintColor = tintColor
         }
+    
+        navigationController?.navigationBar.addSubview(progressView)
+    }
+    
+    func rollbackState() {
+        progressView.removeFromSuperview()
+    
+        navigationController?.navigationBar.tintColor = previousNavigationBarState.tintColor
+        navigationController?.toolbar.tintColor = previousToolbarState.tintColor
+        
+        navigationController?.setToolbarHidden(previousToolbarState.hidden, animated: true)
+        navigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
     @objc func backDidClick(sender: AnyObject) {

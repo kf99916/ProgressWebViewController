@@ -35,13 +35,13 @@ class ViewController: UIViewController {
             }
 
             progressWebViewController.url = URL(string: "https://www.apple.com")
-            progressWebViewController.tintColor = .red
+            progressWebViewController.navigationItem.title = "Apple"
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
             progressWebViewController.url = URL(string: "https://www.apple.com")
-            progressWebViewController.navigationItem.title = "Apple"
+            progressWebViewController.tintColor = .red
         default:
             print("Unknown segue \(identifier)")
         }

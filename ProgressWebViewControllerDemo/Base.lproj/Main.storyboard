@@ -65,7 +65,9 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="hd6-vV-5bu"/>
                     </view>
-                    <navigationItem key="navigationItem" id="Vnl-L2-N49"/>
+                    <navigationItem key="navigationItem" id="Vnl-L2-N49">
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="hQC-KF-BNB"/>
+                    </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qSw-hz-CAl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
