@@ -12,6 +12,8 @@ import WebKit
 let estimatedProgressKeyPath = "estimatedProgress"
 
 @objc public protocol ProgressWebViewControllerDelegate {
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool
+    
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
@@ -295,7 +297,13 @@ fileprivate extension ProgressWebViewController {
     }
     
     @objc func doneDidClick(sender: AnyObject) {
-        dismiss(animated: true, completion: nil)
+        var canDismiss = true
+        if let url = url {
+            canDismiss = delegate?.progressWebViewController?(self, canDismiss: url) ?? true
+        }
+        if canDismiss {
+            dismiss(animated: true, completion: nil)
+        }
     }
 }
 
@@ -309,6 +317,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         updateBarButtonItems()
         if let url = webView.url {
+            self.url = url
             delegate?.progressWebViewController?(self, didStart: url)
         }
     }
