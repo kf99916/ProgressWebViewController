@@ -14,11 +14,31 @@ let estimatedProgressKeyPath = "estimatedProgress"
 open class ProgressWebViewController: UIViewController {
 
     open var url: URL?
-    open var doneBarButtonItemEnabled = true
+    open var doneBarButtonItemPosition: NavigationBarPosition = .left
     open var progressTintColor: UIColor?
+    open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
+    open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
+    open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
     
-    var webView: WKWebView!
-    var progressView: UIProgressView!
+    fileprivate var webView: WKWebView!
+    fileprivate var progressView: UIProgressView!
+    fileprivate var previousNavigationBarHidden = false
+    fileprivate var previousToolbarHidden = false
+    
+    lazy fileprivate var barButtonItemMapping: [BarButtonItemType: UIBarButtonItem] = {
+       return [
+        .back: UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(backDidClick(sender:))),
+        .forward: UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(forwardDidClick(sender:))),
+        .reload: UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadDidClick(sender:))),
+        .activity: UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(activityDidClick(sender:))),
+        .done: UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:))),
+        .flexibleSpace: UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        ]
+    }()
+    
+    deinit {
+        webView.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
+    }
     
     override open func loadView() {
         let webConfiguration = WKWebViewConfiguration()
@@ -37,14 +57,18 @@ open class ProgressWebViewController: UIViewController {
     
     override open func viewDidLoad() {
         super.viewDidLoad()
-    
-        setUpProgressView()
         
-        if doneBarButtonItemEnabled && presentingViewController != nil {
-            addDoneBarButtonItem()
-        }
-
         // Do any additional setup after loading the view.
+        navigationItem.title = navigationItem.title ?? url?.absoluteString
+        
+        if let navigationController = navigationController {
+            previousNavigationBarHidden = navigationController.navigationBar.isHidden
+            previousToolbarHidden = navigationController.toolbar.isHidden
+        }
+        
+        setUpProgressView()
+        addBarButtonItems()
+        
         if let url = url {
             let request = URLRequest(url: url)
             webView.load(request)
@@ -57,16 +81,21 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        guard let navigationController = navigationController else {
-            return
-        }
-        navigationController.navigationBar.addSubview(progressView)
+        navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.setToolbarHidden(false, animated: true)
+        
+        navigationController?.navigationBar.isHidden = false
+        navigationController?.toolbar.isHidden = false
+        navigationController?.navigationBar.addSubview(progressView)
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         progressView.removeFromSuperview()
+        
+        navigationController?.setToolbarHidden(previousToolbarHidden, animated: true)
+        navigationController?.setNavigationBarHidden(previousNavigationBarHidden, animated: true)
     }
 
     override open func didReceiveMemoryWarning() {
@@ -92,22 +121,10 @@ open class ProgressWebViewController: UIViewController {
             })
         }
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 
-// MARK: - Internal Methods
-extension ProgressWebViewController {
+// MARK: - Fileprivate Methods
+fileprivate extension ProgressWebViewController {
     func setUpProgressView() {
         guard let navigationController = navigationController else {
             return
@@ -121,13 +138,72 @@ extension ProgressWebViewController {
         }
     }
     
-    func addDoneBarButtonItem () {
-        if navigationItem.leftBarButtonItems == nil {
-            navigationItem.leftBarButtonItems = []
+    func addBarButtonItems() {
+        if presentingViewController != nil {
+            switch doneBarButtonItemPosition {
+            case .left:
+                if !leftNavigaionBarItemTypes.contains(.done) {
+                    leftNavigaionBarItemTypes.insert(.done, at: 0)
+                }
+            case .right:
+                if !rightNavigaionBarItemTypes.contains(.done) {
+                    rightNavigaionBarItemTypes.insert(.done, at: 0)
+                }
+            case .none:
+                break
+            }
+        }
+
+        navigationItem.leftBarButtonItems = leftNavigaionBarItemTypes.map {
+            barButtonItemType in
+            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+                return barButtonItem
+            }
+            return UIBarButtonItem()
         }
         
-        let doneBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:)))
-        navigationItem.leftBarButtonItems?.append(doneBarButtonItem)
+        navigationItem.rightBarButtonItems = rightNavigaionBarItemTypes.map {
+            barButtonItemType in
+            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+                return barButtonItem
+            }
+            return UIBarButtonItem()
+        }
+        
+        var itemTypes = toolbarItemTypes
+        for index in 0..<itemTypes.count - 1 {
+            itemTypes.insert(.flexibleSpace, at: 2 * index + 1)
+        }
+        
+        setToolbarItems(itemTypes.map {
+            barButtonItemType -> UIBarButtonItem in
+            if let barButtonItem = barButtonItemMapping[barButtonItemType] {
+                return barButtonItem
+            }
+            return UIBarButtonItem()
+        }, animated: true)
+    }
+    
+    @objc func backDidClick(sender: AnyObject) {
+        webView.goBack()
+    }
+    
+    @objc func forwardDidClick(sender: AnyObject) {
+        webView.goForward()
+    }
+    
+    @objc func reloadDidClick(sender: AnyObject) {
+        webView.stopLoading()
+        webView.reload()
+    }
+    
+    @objc func activityDidClick(sender: AnyObject) {
+        guard let url = url else {
+            return
+        }
+        
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        present(activityViewController, animated: true, completion: nil)
     }
     
     @objc func doneDidClick(sender: AnyObject) {

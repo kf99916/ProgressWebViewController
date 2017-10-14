@@ -17,6 +17,7 @@
 		AA28A1D31F91C89E00B67E53 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA28A1D21F91C89D00B67E53 /* WebKit.framework */; };
 		AA28A1D41F91C8A500B67E53 /* ProgressWebViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA28A1AE1F91C84600B67E53 /* ProgressWebViewController.framework */; };
 		AA28A1D61F91E1A200B67E53 /* ProgressWebViewController.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = AA28A1AE1F91C84600B67E53 /* ProgressWebViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AA28A1D81F91ED7C00B67E53 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1D71F91ED7C00B67E53 /* Enums.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,7 @@
 		AA28A1CB1F91C86700B67E53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA28A1CF1F91C87D00B67E53 /* ProgressWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressWebViewController.swift; sourceTree = "<group>"; };
 		AA28A1D21F91C89D00B67E53 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		AA28A1D71F91ED7C00B67E53 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +95,7 @@
 				AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */,
 				AA28A1B21F91C84600B67E53 /* Info.plist */,
 				AA28A1CF1F91C87D00B67E53 /* ProgressWebViewController.swift */,
+				AA28A1D71F91ED7C00B67E53 /* Enums.swift */,
 			);
 			path = ProgressWebViewController;
 			sourceTree = "<group>";
@@ -233,6 +236,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA28A1D81F91ED7C00B67E53 /* Enums.swift in Sources */,
 				AA28A1D01F91C87D00B67E53 /* ProgressWebViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -41,6 +41,7 @@ class ViewController: UIViewController {
                 return
             }
             progressWebViewController.url = URL(string: "https://www.apple.com")
+            progressWebViewController.navigationItem.title = "Apple"
         default:
             print("Unknown segue \(identifier)")
         }
