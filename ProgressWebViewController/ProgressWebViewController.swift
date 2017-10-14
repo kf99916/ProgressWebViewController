@@ -20,12 +20,14 @@ let estimatedProgressKeyPath = "estimatedProgress"
 open class ProgressWebViewController: UIViewController {
 
     open var url: URL?
+    open var tintColor: UIColor?
+    open var delegate: ProgressWebViewControllerDelegate?
+    open var bypassedSSLHosts: [String]?
+    
     open var doneBarButtonItemPosition: NavigationBarPosition = .left
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
-    open var tintColor: UIColor?
-    open var delegate: ProgressWebViewControllerDelegate?
     
     fileprivate var webView: WKWebView!
     fileprivate var progressView: UIProgressView!
@@ -327,6 +329,15 @@ extension ProgressWebViewController: WKNavigationDelegate {
         updateBarButtonItems()
         if let url = webView.url {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
+        }
+    }
+    
+    public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        if let bypassedSSLHosts = bypassedSSLHosts, bypassedSSLHosts.contains(challenge.protectionSpace.host) {
+            let credential = URLCredential(trust: challenge.protectionSpace.serverTrust!)
+            completionHandler(.useCredential, credential)
+        } else {
+            completionHandler(.performDefaultHandling, nil)
         }
     }
 }
