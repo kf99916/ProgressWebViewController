@@ -35,7 +35,7 @@ class ViewController: UIViewController {
             }
 
             progressWebViewController.url = URL(string: "https://www.apple.com")
-            progressWebViewController.progressTintColor = .red
+            progressWebViewController.tintColor = .red
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return

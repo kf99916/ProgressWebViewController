@@ -15,10 +15,10 @@ open class ProgressWebViewController: UIViewController {
 
     open var url: URL?
     open var doneBarButtonItemPosition: NavigationBarPosition = .left
-    open var progressTintColor: UIColor?
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
+    open var tintColor: UIColor?
     
     fileprivate var webView: WKWebView!
     fileprivate var progressView: UIProgressView!
@@ -26,14 +26,16 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var previousToolbarHidden = false
     
     lazy fileprivate var barButtonItemMapping: [BarButtonItemType: UIBarButtonItem] = {
-       return [
-        .back: UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(backDidClick(sender:))),
-        .forward: UIBarButtonItem(barButtonSystemItem: .pause, target: self, action: #selector(forwardDidClick(sender:))),
-        .reload: UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadDidClick(sender:))),
-        .activity: UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(activityDidClick(sender:))),
-        .done: UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:))),
-        .flexibleSpace: UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        ]
+        let bundle = Bundle(for: ProgressWebViewController.self)
+        
+        return [
+            .back: UIBarButtonItem(image: UIImage(named: "Back", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(backDidClick(sender:))),
+            .forward: UIBarButtonItem(image: UIImage(named: "Forward", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(forwardDidClick(sender:))),
+            .reload: UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reloadDidClick(sender:))),
+            .activity: UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(activityDidClick(sender:))),
+            .done: UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneDidClick(sender:))),
+            .flexibleSpace: UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+            ]
     }()
     
     deinit {
@@ -133,8 +135,9 @@ fileprivate extension ProgressWebViewController {
         progressView = UIProgressView(progressViewStyle: .default)
         progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
-        if let progressTintColor = progressTintColor {
-            progressView.progressTintColor = progressTintColor
+        
+        if let tintColor = tintColor {
+            progressView.progressTintColor = tintColor
         }
     }
     
@@ -170,6 +173,10 @@ fileprivate extension ProgressWebViewController {
             return UIBarButtonItem()
         }
         
+        if let tintColor = tintColor {
+            navigationController?.navigationBar.tintColor = tintColor
+        }
+        
         var itemTypes = toolbarItemTypes
         for index in 0..<itemTypes.count - 1 {
             itemTypes.insert(.flexibleSpace, at: 2 * index + 1)
@@ -182,6 +189,10 @@ fileprivate extension ProgressWebViewController {
             }
             return UIBarButtonItem()
         }, animated: true)
+        
+        if let tintColor = tintColor {
+            navigationController?.toolbar.tintColor = tintColor
+        }
     }
     
     @objc func backDidClick(sender: AnyObject) {
