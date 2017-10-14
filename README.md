@@ -10,7 +10,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 
 ## Features
 - :white_check_mark: Progress bar in navigation bar
-- :white_check_mark: Bypass SSL according to the assigned hosts
+- :white_check_mark: Bypass SSL according to the assigned hosts.( i.e., you can access the self-signed certificate websites with ProgressWebViewController)
 - :white_check_mark: Customize bar button items
 
 ## Requirements
