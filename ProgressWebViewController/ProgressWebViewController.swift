@@ -11,6 +11,12 @@ import WebKit
 
 let estimatedProgressKeyPath = "estimatedProgress"
 
+@objc public protocol ProgressWebViewControllerDelegate {
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
+}
+
 open class ProgressWebViewController: UIViewController {
 
     open var url: URL?
@@ -19,6 +25,7 @@ open class ProgressWebViewController: UIViewController {
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
     open var tintColor: UIColor?
+    open var delegate: ProgressWebViewControllerDelegate?
     
     fileprivate var webView: WKWebView!
     fileprivate var progressView: UIProgressView!
@@ -298,16 +305,28 @@ extension ProgressWebViewController: WKUIDelegate {
 extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         updateBarButtonItems()
+        if let url = webView.url {
+            delegate?.progressWebViewController?(self, didStart: url)
+        }
     }
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         updateBarButtonItems()
+        if let url = webView.url {
+            delegate?.progressWebViewController?(self, didFinish: url)
+        }
     }
     
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
+        if let url = webView.url {
+            delegate?.progressWebViewController?(self, didFail: url, withError: error)
+        }
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
+        if let url = webView.url {
+            delegate?.progressWebViewController?(self, didFail: url, withError: error)
+        }
     }
 }
