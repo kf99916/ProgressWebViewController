@@ -32,36 +32,26 @@ import ProgressWebViewController
 ### ProgressWebViewController
 
 A view controller with WKWebView and a progress bar in the navigation bar 
-`var url: URL?` the url to request
 
-`var tintColor: UIColor?` the tint color for the progress bar, navigation bar, and tool bar
-
-`var delegate: ProgressWebViewControllerDelegate?` the delegate for ProgressWebViewController
-
-`var bypassedSSLHosts: [String]?` the bypassed SSL hosts. The hosts must also be disabled in the App Transport Security.
-
-`var websiteTitleInNavigationBar = true` show the website title in the navigation bar
-
-`var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)
-
-`var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)
-
-`var rightNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the right navigation bar (default `[]`)
-
-`var toolbarItemTypes: [BarButtonItemType]` configure the bar button items in the toolbar of navigation controller (default `[.back, .forward, .reload, .activity]`)
+`var url: URL?` the url to request    
+`var tintColor: UIColor?` the tint color for the progress bar, navigation bar, and tool bar    
+`var delegate: ProgressWebViewControllerDelegate?` the delegate for ProgressWebViewController    
+`var bypassedSSLHosts: [String]?` the bypassed SSL hosts. The hosts must also be disabled in the App Transport Security.    
+`var websiteTitleInNavigationBar = true` show the website title in the navigation bar    
+`var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)    
+`var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)    
+`var rightNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the right navigation bar (default `[]`)    
+`var toolbarItemTypes: [BarButtonItemType]` configure the bar button items in the toolbar of navigation controller (default `[.back, .forward, .reload, .activity]`)    
 
 ### ProgressWebViewControllerDelegate
 
 The delegate for ProgressWebViwController
-`optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool`
 
-`optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)`
-
-`optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)`
-
-`optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)`
-
-`optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL) -> Bool`
+`optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool`    
+`optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)`    
+`optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)`    
+`optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)`    
+`optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL) -> Bool`    
 
 ### BarButtonItemType
 The enum for bar button item
