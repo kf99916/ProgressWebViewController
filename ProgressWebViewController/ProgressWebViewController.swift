@@ -299,7 +299,12 @@ fileprivate extension ProgressWebViewController {
     
     @objc func reloadDidClick(sender: AnyObject) {
         webView.stopLoading()
-        webView.reload()
+        if webView.url != nil {
+            webView.reload()
+        }
+        else if let url = url {
+            load(url)
+        }
     }
     
     @objc func stopDidClick(sender: AnyObject) {
