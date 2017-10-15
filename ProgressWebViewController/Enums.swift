@@ -23,3 +23,12 @@ public enum NavigationBarPosition {
     case left
     case right
 }
+
+@objc public enum NavigationType: Int {
+    case linkActivated
+    case formSubmitted
+    case backForward
+    case reload
+    case formResubmitted
+    case other
+}

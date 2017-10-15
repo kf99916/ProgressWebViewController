@@ -18,7 +18,7 @@ let titleKeyPath = "title"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
-    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL) -> Bool
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
 }
 
 open class ProgressWebViewController: UIViewController {
@@ -372,7 +372,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         var actionPolicy: WKNavigationActionPolicy = .allow
-        if let url = webView.url, let result = delegate?.progressWebViewController?(self, decidePolicy: url) {
+        if let url = webView.url, let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
         }
         
