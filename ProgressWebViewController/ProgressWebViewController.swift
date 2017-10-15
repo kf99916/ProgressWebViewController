@@ -110,8 +110,7 @@ open class ProgressWebViewController: UIViewController {
         addBarButtonItems()
         
         if let url = url {
-            let request = URLRequest(url: url)
-            webView.load(request)
+            load(url)
         }
         else {
             print("[ProgressWebViewController][Error] Invalid url:", url as Any)
@@ -154,6 +153,14 @@ open class ProgressWebViewController: UIViewController {
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
+    }
+}
+
+// MARK: - Public Methods
+public extension ProgressWebViewController {
+    func load(_ url: URL) {
+        let request = URLRequest(url: url)
+        webView.load(request)
     }
 }
 
