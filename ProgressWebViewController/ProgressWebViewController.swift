@@ -343,6 +343,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         updateBarButtonItems()
         if let url = webView.url {
+            self.url = url
             delegate?.progressWebViewController?(self, didFinish: url)
         }
     }
@@ -350,6 +351,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
         if let url = webView.url {
+            self.url = url
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
@@ -357,6 +359,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
         if let url = webView.url {
+            self.url = url
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
@@ -372,7 +375,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         var actionPolicy: WKNavigationActionPolicy = .allow
-        if let url = webView.url, let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
+        if let url = navigationAction.request.url, let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
         }
         
