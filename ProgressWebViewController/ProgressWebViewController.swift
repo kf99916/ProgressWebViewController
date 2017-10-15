@@ -211,8 +211,10 @@ fileprivate extension ProgressWebViewController {
             return UIBarButtonItem()
         }
         
-        for index in 0..<toolbarItemTypes.count - 1 {
-            toolbarItemTypes.insert(.flexibleSpace, at: 2 * index + 1)
+        if toolbarItemTypes.count > 0 {
+            for index in 0..<toolbarItemTypes.count - 1 {
+                toolbarItemTypes.insert(.flexibleSpace, at: 2 * index + 1)
+            }
         }
         
         setToolbarItems(toolbarItemTypes.map {
@@ -259,7 +261,7 @@ fileprivate extension ProgressWebViewController {
     
     func setUpState() {
         navigationController?.setNavigationBarHidden(false, animated: true)
-        navigationController?.setToolbarHidden(false, animated: true)
+        navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
             progressView.progressTintColor = tintColor
