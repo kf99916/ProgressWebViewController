@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.1.0
+- Assign cookies to the web view.
+- Fix warnings about layout constraints in the demo project.
+
 ## Version 1.0.1
 - Fix a crash if the toolbarItemTypes is empty.
 - Update ProgressWebViewControllerDelegate.

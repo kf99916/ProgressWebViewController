@@ -12,6 +12,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 - :white_check_mark: Progress bar in navigation bar
 - :white_check_mark: Bypass SSL according to the assigned hosts.( i.e., you can access the self-signed certificate websites with ProgressWebViewController)
 - :white_check_mark: Customize bar button items
+- :white_check_mark: Assign cookies to the web view
 
 ## Requirements
 
@@ -42,6 +43,7 @@ A view controller with WKWebView and a progress bar in the navigation bar
 `var tintColor: UIColor?` the tint color for the progress bar, navigation bar, and tool bar    
 `var delegate: ProgressWebViewControllerDelegate?` the delegate for ProgressWebViewController    
 `var bypassedSSLHosts: [String]?` the bypassed SSL hosts. The hosts must also be disabled in the App Transport Security.    
+`var cookies: [HTTPCookie]?` the assigned cookies.
 `var websiteTitleInNavigationBar = true` show the website title in the navigation bar    
 `var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)    
 `var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)    
