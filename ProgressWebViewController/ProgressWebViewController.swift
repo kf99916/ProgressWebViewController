@@ -410,7 +410,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
             return
         }
         var actionPolicy: WKNavigationActionPolicy = .allow
-        if let cookies = availableCookies, cookies.count > 0 {
+        if url.host == self.url?.host, let cookies = availableCookies, cookies.count > 0 {
             if let headerFields = navigationAction.request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] {
                 let requestCookies = cookieString.components(separatedBy: ";").map {
                     cookie in
