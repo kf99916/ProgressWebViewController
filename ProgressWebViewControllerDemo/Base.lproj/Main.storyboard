@@ -58,7 +58,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="pYm-fh-PVO" firstAttribute="top" secondItem="hd6-vV-5bu" secondAttribute="top" constant="178" id="5Ux-BO-lOo"/>
-                            <constraint firstItem="fEX-Hn-gk7" firstAttribute="top" secondItem="pYm-fh-PVO" secondAttribute="bottom" constant="63" id="DrV-9p-Q6l"/>
                             <constraint firstItem="fEX-Hn-gk7" firstAttribute="centerX" secondItem="rxc-Ss-KUL" secondAttribute="centerX" id="MbH-nF-7aA"/>
                             <constraint firstItem="hd6-vV-5bu" firstAttribute="bottom" secondItem="fEX-Hn-gk7" secondAttribute="bottom" constant="242" id="Zjd-mO-ELE"/>
                             <constraint firstItem="pYm-fh-PVO" firstAttribute="centerX" secondItem="rxc-Ss-KUL" secondAttribute="centerX" id="ipk-HG-l0d"/>
