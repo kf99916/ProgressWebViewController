@@ -11,6 +11,7 @@ import WebKit
 
 let estimatedProgressKeyPath = "estimatedProgress"
 let titleKeyPath = "title"
+let cookieKey = "Cookie"
 
 @objc public protocol ProgressWebViewControllerDelegate {
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool
@@ -27,6 +28,7 @@ open class ProgressWebViewController: UIViewController {
     open var tintColor: UIColor?
     open var delegate: ProgressWebViewControllerDelegate?
     open var bypassedSSLHosts: [String]?
+    open var cookies: [HTTPCookie]?
     
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .left
@@ -159,13 +161,37 @@ open class ProgressWebViewController: UIViewController {
 // MARK: - Public Methods
 public extension ProgressWebViewController {
     func load(_ url: URL) {
-        let request = URLRequest(url: url)
-        webView.load(request)
+        webView.load(createRequest(url: url))
     }
 }
 
 // MARK: - Fileprivate Methods
 fileprivate extension ProgressWebViewController {
+    var availableCookies: [HTTPCookie]? {
+        return cookies?.filter {
+            cookie in
+            var result = true
+            if let host = url?.host, !cookie.domain.hasSuffix(host) {
+                result = false
+            }
+            if cookie.isSecure && url?.scheme != "https" {
+                result = false
+            }
+            
+            return result
+        }
+    }
+    func createRequest(url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        
+        // Set up Cookies
+        if let cookies = availableCookies {
+            request.setValue(HTTPCookie.requestHeaderFields(with: cookies)[cookieKey], forHTTPHeaderField: cookieKey)
+        }
+
+        return request
+    }
+    
     func setUpProgressView() {
         guard let navigationController = navigationController else {
             return
@@ -379,8 +405,41 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
         var actionPolicy: WKNavigationActionPolicy = .allow
-        if let url = navigationAction.request.url, let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
+        if let cookies = availableCookies, cookies.count > 0 {
+            if let headerFields = navigationAction.request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] {
+                let requestCookies = cookieString.components(separatedBy: ";").map {
+                    cookie in
+                    return cookie.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "=")
+                }
+                var lost = false
+                for cookie in cookies {
+                    lost = requestCookies.filter {
+                        requestCookie in
+                        return requestCookie[0] == cookie.name && requestCookie[1] == cookie.value
+                    }.count <= 0
+                    if lost {
+                        break
+                    }
+                }
+                actionPolicy = (lost) ? .cancel : .allow
+            }
+            else {
+                actionPolicy = .cancel
+            }
+            
+            if actionPolicy == .cancel {
+                load(url)
+                decisionHandler(actionPolicy)
+                return
+            }
+        }
+
+        if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
         }
         

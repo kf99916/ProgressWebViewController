@@ -28,13 +28,14 @@ class ViewController: UIViewController {
             return
         }
         
+        let urlString = "https://www.apple.com"
         switch identifier {
         case "Present":
             guard let navigationController = segue.destination as? UINavigationController, let progressWebViewController = navigationController.topViewController as? ProgressWebViewController else {
                 return
             }
 
-            progressWebViewController.url = URL(string: "https://www.apple.com")
+            progressWebViewController.url = URL(string: urlString)
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Apple Website"
             progressWebViewController.rightNavigaionBarItemTypes = [.reload]
@@ -43,8 +44,19 @@ class ViewController: UIViewController {
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
-            progressWebViewController.url = URL(string: "https://www.apple.com")
+            progressWebViewController.url = URL(string: urlString)
             progressWebViewController.tintColor = .red
+            progressWebViewController.cookies = [
+                HTTPCookie(properties:
+                [HTTPCookiePropertyKey.originURL: urlString,
+                 HTTPCookiePropertyKey.path: "/",
+                 HTTPCookiePropertyKey.name: "author",
+                 HTTPCookiePropertyKey.value: "Zheng-Xiang Ke"])!,
+                HTTPCookie(properties:
+                [HTTPCookiePropertyKey.originURL: urlString,
+                 HTTPCookiePropertyKey.path: "/",
+                 HTTPCookiePropertyKey.name: "GitHub",
+                 HTTPCookiePropertyKey.value: "kf99916"])!]
         default:
             print("Unknown segue \(identifier)")
         }
