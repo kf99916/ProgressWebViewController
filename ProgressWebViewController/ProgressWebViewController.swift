@@ -405,7 +405,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        guard let url = navigationAction.request.url else {
+        guard let url = navigationAction.request.url, !url.isFileURL else {
             decisionHandler(.allow)
             return
         }
