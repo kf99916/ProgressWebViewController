@@ -38,7 +38,7 @@ class ViewController: UIViewController {
             progressWebViewController.url = URL(string: urlString)
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Apple Website"
-            progressWebViewController.rightNavigaionBarItemTypes = [.reload]
+            progressWebViewController.leftNavigaionBarItemTypes = [.reload]
             progressWebViewController.toolbarItemTypes = [.back, .forward, .activity]
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {

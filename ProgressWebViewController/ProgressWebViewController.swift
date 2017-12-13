@@ -31,7 +31,7 @@ open class ProgressWebViewController: UIViewController {
     open var cookies: [HTTPCookie]?
     
     open var websiteTitleInNavigationBar = true
-    open var doneBarButtonItemPosition: NavigationBarPosition = .left
+    open var doneBarButtonItemPosition: NavigationBarPosition = .right
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
