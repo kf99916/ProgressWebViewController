@@ -163,6 +163,12 @@ public extension ProgressWebViewController {
     func load(_ url: URL) {
         webView.load(createRequest(url: url))
     }
+    
+    func goBackToFirstPage() {
+        if let firstPageItem = webView.backForwardList.backList.first {
+            webView.go(to: firstPageItem)
+        }
+    }
 }
 
 // MARK: - Fileprivate Methods
