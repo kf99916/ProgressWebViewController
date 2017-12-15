@@ -36,11 +36,8 @@ open class ProgressWebViewController: UIViewController {
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
     
-    fileprivate lazy var webView: WKWebView = {
-        let webConfiguration = WKWebViewConfiguration()
-        return WKWebView(frame: .zero, configuration: webConfiguration)
-    }()
-    fileprivate lazy var progressView: UIProgressView = UIProgressView(progressViewStyle: .default)
+    fileprivate var webView: WKWebView?
+    fileprivate var progressView: UIProgressView?
     
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
@@ -76,13 +73,16 @@ open class ProgressWebViewController: UIViewController {
     }()
     
     deinit {
-        webView.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
+        webView?.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
         if websiteTitleInNavigationBar {
-            webView.removeObserver(self, forKeyPath: titleKeyPath)
+            webView?.removeObserver(self, forKeyPath: titleKeyPath)
         }
     }
     
     override open func loadView() {
+        let webConfiguration = WKWebViewConfiguration()
+        let webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        
         webView.uiDelegate = self
         webView.navigationDelegate = self
         
@@ -95,6 +95,7 @@ open class ProgressWebViewController: UIViewController {
         }
         
         view = webView
+        self.webView = webView
     }
     
     override open func viewDidLoad() {
@@ -139,19 +140,22 @@ open class ProgressWebViewController: UIViewController {
     override open func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         switch keyPath {
         case estimatedProgressKeyPath?:
-            progressView.alpha = 1
-            progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+            guard let estimatedProgress = webView?.estimatedProgress else {
+                return
+            }
+            progressView?.alpha = 1
+            progressView?.setProgress(Float(estimatedProgress), animated: true)
             
-            if(webView.estimatedProgress >= 1.0) {
+            if estimatedProgress >= 1.0 {
                 UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
-                    self.progressView.alpha = 0
+                    self.progressView?.alpha = 0
                 }, completion: {
                     finished in
-                    self.progressView.setProgress(0, animated: false)
+                    self.progressView?.setProgress(0, animated: false)
                 })
             }
         case titleKeyPath?:
-            navigationItem.title = webView.title
+            navigationItem.title = webView?.title
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
@@ -161,12 +165,12 @@ open class ProgressWebViewController: UIViewController {
 // MARK: - Public Methods
 public extension ProgressWebViewController {
     func load(_ url: URL) {
-        webView.load(createRequest(url: url))
+        webView?.load(createRequest(url: url))
     }
     
     func goBackToFirstPage() {
-        if let firstPageItem = webView.backForwardList.backList.first {
-            webView.go(to: firstPageItem)
+        if let firstPageItem = webView?.backForwardList.backList.first {
+            webView?.go(to: firstPageItem)
         }
     }
 }
@@ -202,9 +206,10 @@ fileprivate extension ProgressWebViewController {
         guard let navigationController = navigationController else {
             return
         }
-        
+        let progressView = UIProgressView(progressViewStyle: .default)
         progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
+        self.progressView = progressView
     }
     
     func addBarButtonItems() {
@@ -265,8 +270,8 @@ fileprivate extension ProgressWebViewController {
     }
     
     func updateBarButtonItems() {
-        backBarButtonItem.isEnabled = webView.canGoBack
-        forwardBarButtonItem.isEnabled = webView.canGoForward
+        backBarButtonItem.isEnabled = webView?.canGoBack ?? false
+        forwardBarButtonItem.isEnabled = webView?.canGoForward ?? false
         
         let updateReloadBarButtonItem: (UIBarButtonItem, Bool) -> UIBarButtonItem = {
             [unowned self] barButtonItem, isLoading in
@@ -281,19 +286,20 @@ fileprivate extension ProgressWebViewController {
             return barButtonItem
         }
         
+        let isLoading = webView?.isLoading ?? false
         toolbarItems = toolbarItems?.map {
-            [unowned self] barButtonItem -> UIBarButtonItem in
-            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+            barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, isLoading)
         }
         
         navigationItem.leftBarButtonItems = navigationItem.leftBarButtonItems?.map {
-            [unowned self] barButtonItem -> UIBarButtonItem in
-            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+            barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, isLoading)
         }
         
         navigationItem.rightBarButtonItems = navigationItem.rightBarButtonItems?.map {
-            [unowned self] barButtonItem -> UIBarButtonItem in
-            return updateReloadBarButtonItem(barButtonItem, self.webView.isLoading)
+            barButtonItem -> UIBarButtonItem in
+            return updateReloadBarButtonItem(barButtonItem, isLoading)
         }
     }
     
@@ -302,16 +308,18 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
-            progressView.progressTintColor = tintColor
+            progressView?.progressTintColor = tintColor
             navigationController?.navigationBar.tintColor = tintColor
             navigationController?.toolbar.tintColor = tintColor
         }
     
-        navigationController?.navigationBar.addSubview(progressView)
+        if let progressView = progressView {
+            navigationController?.navigationBar.addSubview(progressView)
+        }
     }
     
     func rollbackState() {
-        progressView.removeFromSuperview()
+        progressView?.removeFromSuperview()
     
         navigationController?.navigationBar.tintColor = previousNavigationBarState.tintColor
         navigationController?.toolbar.tintColor = previousToolbarState.tintColor
@@ -321,17 +329,17 @@ fileprivate extension ProgressWebViewController {
     }
     
     @objc func backDidClick(sender: AnyObject) {
-        webView.goBack()
+        webView?.goBack()
     }
     
     @objc func forwardDidClick(sender: AnyObject) {
-        webView.goForward()
+        webView?.goForward()
     }
     
     @objc func reloadDidClick(sender: AnyObject) {
-        webView.stopLoading()
-        if webView.url != nil {
-            webView.reload()
+        webView?.stopLoading()
+        if webView?.url != nil {
+            webView?.reload()
         }
         else if let url = url {
             load(url)
@@ -339,7 +347,7 @@ fileprivate extension ProgressWebViewController {
     }
     
     @objc func stopDidClick(sender: AnyObject) {
-        webView.stopLoading()
+        webView?.stopLoading()
     }
     
     @objc func activityDidClick(sender: AnyObject) {
