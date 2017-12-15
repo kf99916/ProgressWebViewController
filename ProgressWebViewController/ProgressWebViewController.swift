@@ -36,8 +36,11 @@ open class ProgressWebViewController: UIViewController {
     open var rightNavigaionBarItemTypes: [BarButtonItemType] = []
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
     
-    fileprivate var webView: WKWebView!
-    fileprivate var progressView: UIProgressView!
+    fileprivate lazy var webView: WKWebView = {
+        let webConfiguration = WKWebViewConfiguration()
+        return WKWebView(frame: .zero, configuration: webConfiguration)
+    }()
+    fileprivate lazy var progressView: UIProgressView = UIProgressView(progressViewStyle: .default)
     
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
@@ -80,9 +83,6 @@ open class ProgressWebViewController: UIViewController {
     }
     
     override open func loadView() {
-        let webConfiguration = WKWebViewConfiguration()
-        webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        
         webView.uiDelegate = self
         webView.navigationDelegate = self
         
@@ -203,7 +203,6 @@ fileprivate extension ProgressWebViewController {
             return
         }
         
-        progressView = UIProgressView(progressViewStyle: .default)
         progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
     }
