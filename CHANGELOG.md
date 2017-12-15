@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.3.0
+
+* Let webView and progressView be optional.
+
 ## Version 1.2.0
 
 * Browse the local html files.
