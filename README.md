@@ -2,8 +2,9 @@
 
 A WebViewController implemented by WKWebView with a progress bar in the navigation bar. The WebViewController is safari-like web browser.
 
-[![GitHub forks](https://img.shields.io/github/forks/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/network)
+[![CocoaPods](https://img.shields.io/cocoapods/dt/ProgressWebViewController.svg)](https://cocoapods.org/pods/ProgressWebViewController)
 [![GitHub stars](https://img.shields.io/github/stars/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/network)
 [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProgressWebViewController.svg)](https://cocoapods.org/pods/ProgressWebViewController)
 [![Platform](https://img.shields.io/cocoapods/p/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController)
 [![GitHub license](https://img.shields.io/github/license/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/blob/master/LICENSE)
