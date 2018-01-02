@@ -2,10 +2,11 @@
 
 A WebViewController implemented by WKWebView with a progress bar in the navigation bar. The WebViewController is safari-like web browser.
 
-[![Language Swift](https://img.shields.io/badge/Language-Swift%204.0-orange.svg?style=flat)](https://swift.org)
-[![CocoaPods](https://img.shields.io/cocoapods/v/ProgressWebViewController.svg)](#cocoapods)
-[![Swift Package Manager compatible](https://img.shields.io/badge/Swift%20Package%20Manager-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![License](https://img.shields.io/github/license/kf99916/ProgressWebViewController.svg)](LICENSE)
+[![GitHub forks](https://img.shields.io/github/forks/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/network)
+[![GitHub stars](https://img.shields.io/github/stars/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/stargazers)
+[![CocoaPods Compatible](https://img.shields.io/cocoapods/v/ProgressWebViewController.svg)](https://cocoapods.org/pods/ProgressWebViewController)
+[![Platform](https://img.shields.io/cocoapods/p/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController)
+[![GitHub license](https://img.shields.io/github/license/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/blob/master/LICENSE)
 
 ![ProgressWebViewController](/screenshots/progressWebViewController.png "ProgressWebViewController") ![ProgressWebViewController](/screenshots/progressWebViewController2.png "ProgressWebViewController")
 
