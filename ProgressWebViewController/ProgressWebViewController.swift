@@ -30,12 +30,12 @@ open class ProgressWebViewController: UIViewController {
     open var bypassedSSLHosts: [String]?
     open var cookies: [HTTPCookie]?
     open var headers: [String: String]?
-    open var customUserAgent: String? {
+    open var userAgent: String? {
         didSet {
-            guard let originalUserAgent = originalUserAgent, let customUserAgent = customUserAgent else {
+            guard let originalUserAgent = originalUserAgent, let userAgent = userAgent else {
                 return
             }
-            webView?.customUserAgent = [originalUserAgent, customUserAgent].joined(separator: " ")
+            webView?.customUserAgent = [originalUserAgent, userAgent].joined(separator: " ")
         }
     }
     open var urlsHandledByApp = [
