@@ -48,11 +48,11 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var webView: WKWebView?
     fileprivate var progressView: UIProgressView?
     
-    fileprivate lazy var originalUserAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")
-    
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
+    lazy fileprivate var originalUserAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")
+
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
         return UIBarButtonItem(image: UIImage(named: "Back", in: bundle, compatibleWith: nil), style: .plain, target: self, action: #selector(backDidClick(sender:)))
@@ -350,6 +350,36 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
+    func checkRequestCookies(_ request: URLRequest, cookies: [HTTPCookie]) -> Bool {
+        guard let headerFields = request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] else {
+            return false
+        }
+        
+        let requestCookies = cookieString.components(separatedBy: ";").map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "=")
+        }
+        
+        var valid = true
+        for cookie in cookies {
+            valid = requestCookies.filter {
+                $0[0] == cookie.name && $0[1] == cookie.value
+            }.count > 0
+            if !valid {
+                break
+            }
+        }
+        return valid
+    }
+    
+    func openURLWithApp(_ url: URL) -> Bool {
+        let application = UIApplication.shared
+        if application.canOpenURL(url) {
+            return application.openURL(url)
+        }
+        
+        return false
+    }
+    
     @objc func backDidClick(sender: AnyObject) {
         webView?.goBack()
     }
@@ -444,44 +474,29 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        var actionPolicy: WKNavigationActionPolicy = .allow
+        defer {
+            decisionHandler(actionPolicy)
+        }
         guard let url = navigationAction.request.url, !url.isFileURL else {
-            decisionHandler(.allow)
             return
         }
-        var actionPolicy: WKNavigationActionPolicy = .allow
-        if url.host == self.url?.host, let cookies = availableCookies, cookies.count > 0 {
-            if let headerFields = navigationAction.request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] {
-                let requestCookies = cookieString.components(separatedBy: ";").map {
-                    cookie in
-                    return cookie.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "=")
-                }
-                var lost = false
-                for cookie in cookies {
-                    lost = requestCookies.filter {
-                        requestCookie in
-                        return requestCookie[0] == cookie.name && requestCookie[1] == cookie.value
-                    }.count <= 0
-                    if lost {
-                        break
-                    }
-                }
-                actionPolicy = (lost) ? .cancel : .allow
-            }
-            else {
-                actionPolicy = .cancel
-            }
-            
-            if actionPolicy == .cancel {
-                load(url)
-                decisionHandler(actionPolicy)
-                return
-            }
+        
+        // Handle the app store, tel, mailto, sms, and _blank
+        let schemes = ["tel", "mailto", "sms"]
+        if url.host == "itunes.apple.com" || schemes.contains(url.scheme ?? "") || navigationAction.targetFrame == nil {
+            actionPolicy = openURLWithApp(url) ? .cancel : .allow
+            return
+        }
+        
+        if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
+            load(url)
+            actionPolicy = .cancel
+            return
         }
 
         if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
         }
-        
-        decisionHandler(actionPolicy)
     }
 }
