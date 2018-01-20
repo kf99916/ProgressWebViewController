@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.5.1
+
+* Fix the issue: load the url infinitely if there is no any required cookies and request's cookies.
+
 ## Version 1.5.0
 
 * Open the special urls including the app store, tel, mailto, sms, and _blank with other apps.
