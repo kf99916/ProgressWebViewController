@@ -36,7 +36,6 @@ open class ProgressWebViewController: UIViewController {
                 return
             }
             webView?.customUserAgent = [originalUserAgent, customUserAgent].joined(separator: " ")
-            print(webView?.customUserAgent)
         }
     }
     
