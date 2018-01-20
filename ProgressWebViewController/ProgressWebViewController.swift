@@ -356,6 +356,9 @@ fileprivate extension ProgressWebViewController {
     }
     
     func checkRequestCookies(_ request: URLRequest, cookies: [HTTPCookie]) -> Bool {
+        if cookies.count <= 0 {
+            return true
+        }
         guard let headerFields = request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] else {
             return false
         }
