@@ -364,7 +364,7 @@ fileprivate extension ProgressWebViewController {
         }
         
         let requestCookies = cookieString.components(separatedBy: ";").map {
-            $0.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "=")
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "=", maxSplits: 1).map(String.init)
         }
         
         var valid = false
