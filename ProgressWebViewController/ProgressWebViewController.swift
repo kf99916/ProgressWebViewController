@@ -203,13 +203,17 @@ fileprivate extension ProgressWebViewController {
     }
     
     func setUpProgressView() {
-        guard let navigationController = navigationController else {
-            return
-        }
         let progressView = UIProgressView(progressViewStyle: .default)
-        progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
         self.progressView = progressView
+        updateProgressViewFrame()
+    }
+    
+    func updateProgressViewFrame() {
+        guard let navigationController = navigationController, let progressView = progressView else {
+            return
+        }
+        progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
     }
     
     func addBarButtonItems() {
@@ -379,6 +383,7 @@ extension ProgressWebViewController: WKUIDelegate {
 extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         updateBarButtonItems()
+        updateProgressViewFrame()
         if let url = webView.url {
             self.url = url
             delegate?.progressWebViewController?(self, didStart: url)
@@ -386,6 +391,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         updateBarButtonItems()
+        updateProgressViewFrame()
         if let url = webView.url {
             self.url = url
             delegate?.progressWebViewController?(self, didFinish: url)
@@ -394,6 +400,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
+        updateProgressViewFrame()
         if let url = webView.url {
             self.url = url
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
@@ -402,6 +409,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
+        updateProgressViewFrame()
         if let url = webView.url {
             self.url = url
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
