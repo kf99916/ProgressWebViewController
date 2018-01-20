@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ProgressWebViewController'
-  s.version          = '1.3.1'
+  s.version          = '1.4.0'
   s.summary          = 'A WebViewController implemented by WKWebView with a progress bar in the navigation bar'
 
 # This description is used to generate tags and improve search results.

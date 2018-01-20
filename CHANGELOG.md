@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.4.0
+
+* Support custom headers.
+* Support custom user agent.
+
 ## Version 1.3.1
 
 * Support large titles for navigation bars in iOS 11.
