@@ -29,6 +29,7 @@ open class ProgressWebViewController: UIViewController {
     open var delegate: ProgressWebViewControllerDelegate?
     open var bypassedSSLHosts: [String]?
     open var cookies: [HTTPCookie]?
+    open var headers: [String: String]?
     
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .right
@@ -194,9 +195,16 @@ fileprivate extension ProgressWebViewController {
     func createRequest(url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         
+        // Set up headers
+        if let headers = headers {
+            for (field, value) in headers {
+                request.addValue(value, forHTTPHeaderField: field)
+            }
+        }
+        
         // Set up Cookies
-        if let cookies = availableCookies {
-            request.setValue(HTTPCookie.requestHeaderFields(with: cookies)[cookieKey], forHTTPHeaderField: cookieKey)
+        if let cookies = availableCookies, let value = HTTPCookie.requestHeaderFields(with: cookies)[cookieKey] {
+            request.addValue(value, forHTTPHeaderField: cookieKey)
         }
 
         return request

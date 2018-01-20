@@ -24,18 +24,18 @@ class ViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        guard let identifier = segue.identifier else {
+        guard let identifier = segue.identifier, let url = URL(string: "https://www.apple.com") else {
             return
         }
-        
-        let urlString = "https://www.apple.com"
+
         switch identifier {
         case "Present":
             guard let navigationController = segue.destination as? UINavigationController, let progressWebViewController = navigationController.topViewController as? ProgressWebViewController else {
                 return
             }
 
-            progressWebViewController.url = URL(string: urlString)
+            progressWebViewController.url = url
+            progressWebViewController.bypassedSSLHosts = [url.host!]
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Apple Website"
             progressWebViewController.leftNavigaionBarItemTypes = [.reload]
@@ -44,16 +44,17 @@ class ViewController: UIViewController {
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
-            progressWebViewController.url = URL(string: urlString)
+            progressWebViewController.url = url
+            progressWebViewController.headers = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
             progressWebViewController.cookies = [
                 HTTPCookie(properties:
-                [HTTPCookiePropertyKey.originURL: urlString,
+                [HTTPCookiePropertyKey.originURL: url.absoluteString,
                  HTTPCookiePropertyKey.path: "/",
                  HTTPCookiePropertyKey.name: "author",
                  HTTPCookiePropertyKey.value: "Zheng-Xiang Ke"])!,
                 HTTPCookie(properties:
-                [HTTPCookiePropertyKey.originURL: urlString,
+                [HTTPCookiePropertyKey.originURL: url.absoluteString,
                  HTTPCookiePropertyKey.path: "/",
                  HTTPCookiePropertyKey.name: "GitHub",
                  HTTPCookiePropertyKey.value: "kf99916"])!]
