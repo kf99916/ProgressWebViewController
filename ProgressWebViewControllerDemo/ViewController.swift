@@ -36,6 +36,7 @@ class ViewController: UIViewController {
 
             progressWebViewController.url = url
             progressWebViewController.bypassedSSLHosts = [url.host!]
+            progressWebViewController.customUserAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Apple Website"
             progressWebViewController.leftNavigaionBarItemTypes = [.reload]

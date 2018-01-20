@@ -32,7 +32,11 @@ open class ProgressWebViewController: UIViewController {
     open var headers: [String: String]?
     open var customUserAgent: String? {
         didSet {
-            webView?.customUserAgent = customUserAgent
+            guard let originalUserAgent = originalUserAgent, let customUserAgent = customUserAgent else {
+                return
+            }
+            webView?.customUserAgent = [originalUserAgent, customUserAgent].joined(separator: " ")
+            print(webView?.customUserAgent)
         }
     }
     
@@ -44,6 +48,8 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView?
     fileprivate var progressView: UIProgressView?
+    
+    fileprivate lazy var originalUserAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")
     
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
