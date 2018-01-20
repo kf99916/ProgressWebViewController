@@ -21,6 +21,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 * :white_check_mark: Support large titles for navigation bars in iOS 11
 * :white_check_mark: Support custom headers
 * :white_check_mark: Support custom user agent
+* :white_check_mark: Open the special urls including the app store, tel, mailto, sms, and _blank with other apps
 
 ## Requirements
 
@@ -51,7 +52,14 @@ A view controller with WKWebView and a progress bar in the navigation bar
 `var tintColor: UIColor?` the tint color for the progress bar, navigation bar, and tool bar  
 `var delegate: ProgressWebViewControllerDelegate?` the delegate for ProgressWebViewController  
 `var bypassedSSLHosts: [String]?` the bypassed SSL hosts. The hosts must also be disabled in the App Transport Security.  
-`var cookies: [HTTPCookie]?` the assigned cookies.
+`var cookies: [HTTPCookie]?` the assigned cookies   
+`var headers: [String: String]?` the custom headers   
+`var userAgent: String?` the custom user agent    
+`var urlsHandledByApp: [String: Any]` configure the urls handled by other apps (default `[
+        "hosts": ["itunes.apple.com"],
+        "schemes": ["tel", "mailto", "sms"],
+        "_blank": true
+        ]`)   
 `var websiteTitleInNavigationBar = true` show the website title in the navigation bar  
 `var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)  
 `var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)  

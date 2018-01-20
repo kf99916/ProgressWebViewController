@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.5.0
+
+* Open the special urls including the app store, tel, mailto, sms, and _blank with other apps.
+
 ## Version 1.4.0
 
 * Support custom headers.
