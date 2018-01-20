@@ -18,6 +18,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 * :white_check_mark: Customize bar button items
 * :white_check_mark: Assign cookies to the web view
 * :white_check_mark: Browse the local html files
+* :white_check_mark: Support large titles for navigation bars in iOS 11
 
 ## Requirements
 

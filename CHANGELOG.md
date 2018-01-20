@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.3.1
+
+* Support large titles for navigation bars in iOS 11.
+
 ## Version 1.3.0
 
 * Let webView and progressView be optional.
