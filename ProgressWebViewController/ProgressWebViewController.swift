@@ -38,6 +38,11 @@ open class ProgressWebViewController: UIViewController {
             webView?.customUserAgent = [originalUserAgent, customUserAgent].joined(separator: " ")
         }
     }
+    open var urlsHandledByApp = [
+        "hosts": ["itunes.apple.com"],
+        "schemes": ["tel", "mailto", "sms"],
+        "_blank": true
+        ] as [String : Any]
     
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .right
@@ -359,11 +364,11 @@ fileprivate extension ProgressWebViewController {
             $0.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: "=")
         }
         
-        var valid = true
+        var valid = false
         for cookie in cookies {
             valid = requestCookies.filter {
                 $0[0] == cookie.name && $0[1] == cookie.value
-            }.count > 0
+                }.count > 0
             if !valid {
                 break
             }
@@ -378,6 +383,25 @@ fileprivate extension ProgressWebViewController {
         }
         
         return false
+    }
+    
+    func handleURLWithApp(_ url: URL, targetFrame: WKFrameInfo?) -> Bool {
+        let hosts = urlsHandledByApp["hosts"] as? [String]
+        let schemes = urlsHandledByApp["schemes"] as? [String]
+        let blank = urlsHandledByApp["_blank"] as? Bool
+        
+        var tryToOpenURLWithApp = false
+        if let host = url.host, hosts?.contains(host) ?? false {
+            tryToOpenURLWithApp = true
+        }
+        if let scheme = url.scheme, schemes?.contains(scheme) ?? false {
+            tryToOpenURLWithApp = true
+        }
+        if blank ?? false && targetFrame == nil {
+            tryToOpenURLWithApp = true
+        }
+        
+        return tryToOpenURLWithApp ? openURLWithApp(url) : false
     }
     
     @objc func backDidClick(sender: AnyObject) {
@@ -481,11 +505,9 @@ extension ProgressWebViewController: WKNavigationDelegate {
         guard let url = navigationAction.request.url, !url.isFileURL else {
             return
         }
-        
-        // Handle the app store, tel, mailto, sms, and _blank
-        let schemes = ["tel", "mailto", "sms"]
-        if url.host == "itunes.apple.com" || schemes.contains(url.scheme ?? "") || navigationAction.targetFrame == nil {
-            actionPolicy = openURLWithApp(url) ? .cancel : .allow
+   
+        if handleURLWithApp(url, targetFrame: navigationAction.targetFrame) {
+            actionPolicy = .cancel
             return
         }
         
