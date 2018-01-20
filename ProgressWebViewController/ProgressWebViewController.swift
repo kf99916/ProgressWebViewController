@@ -30,6 +30,7 @@ open class ProgressWebViewController: UIViewController {
     open var bypassedSSLHosts: [String]?
     open var cookies: [HTTPCookie]?
     open var headers: [String: String]?
+    open var customUserAgent: String?
     
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .right
@@ -94,6 +95,7 @@ open class ProgressWebViewController: UIViewController {
         if websiteTitleInNavigationBar {
             webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
         }
+        webView.customUserAgent = customUserAgent
         
         view = webView
         self.webView = webView
