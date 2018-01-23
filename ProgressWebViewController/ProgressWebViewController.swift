@@ -23,13 +23,8 @@ let cookieKey = "Cookie"
 }
 
 open class ProgressWebViewController: UIViewController {
-
     open var url: URL?
-    open var tintColor: UIColor?
-    open var delegate: ProgressWebViewControllerDelegate?
     open var bypassedSSLHosts: [String]?
-    open var cookies: [HTTPCookie]?
-    open var headers: [String: String]?
     open var userAgent: String?
     open var urlsHandledByApp = [
         "hosts": ["itunes.apple.com"],
@@ -37,6 +32,32 @@ open class ProgressWebViewController: UIViewController {
         "_blank": true
         ] as [String : Any]
     
+    open var cookies: [HTTPCookie]? {
+        didSet {
+            var shouldReload = (cookies != nil && oldValue == nil) || (cookies == nil && oldValue != nil)
+            if let cookies = cookies, let oldValue = oldValue, cookies != oldValue {
+                shouldReload = true
+            }
+            if shouldReload, let url = url {
+                load(url)
+            }
+        }
+    }
+    open var headers: [String: String]? {
+        didSet {
+            var shouldReload = (headers != nil && oldValue == nil) || (headers == nil && oldValue != nil)
+            if let headers = headers, let oldValue = oldValue, headers != oldValue {
+                shouldReload = true
+            }
+            if shouldReload, let url = url {
+                load(url)
+            }
+        }
+    }
+    
+    open var delegate: ProgressWebViewControllerDelegate?
+    
+    open var tintColor: UIColor?
     open var websiteTitleInNavigationBar = true
     open var doneBarButtonItemPosition: NavigationBarPosition = .right
     open var leftNavigaionBarItemTypes: [BarButtonItemType] = []
@@ -134,7 +155,7 @@ open class ProgressWebViewController: UIViewController {
             load(url)
         }
         else {
-            print("[ProgressWebViewController][Error] Invalid url:", url as Any)
+            print("[ProgressWebViewController][Error] NULL URL")
         }
     }
     
@@ -209,6 +230,7 @@ fileprivate extension ProgressWebViewController {
             return result
         }
     }
+    
     func createRequest(url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         
@@ -357,30 +379,6 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
-    func checkRequestCookies(_ request: URLRequest, cookies: [HTTPCookie]) -> Bool {
-        if cookies.count <= 0 {
-            return true
-        }
-        guard let headerFields = request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] else {
-            return false
-        }
-        
-        let requestCookies = cookieString.components(separatedBy: ";").map {
-            $0.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "=", maxSplits: 1).map(String.init)
-        }
-        
-        var valid = false
-        for cookie in cookies {
-            valid = requestCookies.filter {
-                $0[0] == cookie.name && $0[1] == cookie.value
-                }.count > 0
-            if !valid {
-                break
-            }
-        }
-        return valid
-    }
-    
     func openURLWithApp(_ url: URL) -> Bool {
         let application = UIApplication.shared
         if application.canOpenURL(url) {
@@ -516,12 +514,6 @@ extension ProgressWebViewController: WKNavigationDelegate {
             return
         }
         
-        if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
-            load(url)
-            actionPolicy = .cancel
-            return
-        }
-
         if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
         }
