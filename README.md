@@ -66,6 +66,28 @@ A view controller with WKWebView and a progress bar in the navigation bar
 `var rightNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the right navigation bar (default `[]`)  
 `var toolbarItemTypes: [BarButtonItemType]` configure the bar button items in the toolbar of navigation controller (default `[.back, .forward, .reload, .activity]`)
 
+#### Subclassing
+
+You should set up the webview in `loadView()` and set up others in `viewDidLoad()`
+
+```swift
+class MyWebViewController: ProgressWebViewController {
+    override open func loadView() {
+        super.loadView()
+        
+        // set up webview, including cookies, headers, user agent, and so on.
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+    }
+
+    // Other methods
+}
+```
+
 ### ProgressWebViewControllerDelegate
 
 The delegate for ProgressWebViwController

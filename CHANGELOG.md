@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.6.0
+
+* Reload url if cookies or headers are changed.
+* Ensure the web view loads a url in the main thread.
+
 ## Version 1.5.1
 
 * Fix the issue: load the url infinitely if there is no any required cookies and request's cookies.
