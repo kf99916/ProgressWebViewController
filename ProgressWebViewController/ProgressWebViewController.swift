@@ -204,7 +204,13 @@ open class ProgressWebViewController: UIViewController {
 // MARK: - Public Methods
 public extension ProgressWebViewController {
     func load(_ url: URL) {
-        webView?.load(createRequest(url: url))
+        guard let webView = webView else {
+            return
+        }
+        let request = createRequest(url: url)
+        DispatchQueue.main.async {
+            webView.load(request)
+        }
     }
     
     func goBackToFirstPage() {
