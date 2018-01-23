@@ -30,14 +30,7 @@ open class ProgressWebViewController: UIViewController {
     open var bypassedSSLHosts: [String]?
     open var cookies: [HTTPCookie]?
     open var headers: [String: String]?
-    open var userAgent: String? {
-        didSet {
-            guard let originalUserAgent = originalUserAgent, let userAgent = userAgent else {
-                return
-            }
-            webView?.customUserAgent = [originalUserAgent, userAgent].joined(separator: " ")
-        }
-    }
+    open var userAgent: String?
     open var urlsHandledByApp = [
         "hosts": ["itunes.apple.com"],
         "schemes": ["tel", "mailto", "sms"],
@@ -127,6 +120,15 @@ open class ProgressWebViewController: UIViewController {
         
         setUpProgressView()
         addBarButtonItems()
+        
+        if let userAgent = userAgent {
+            if let originalUserAgent = originalUserAgent {
+                webView?.customUserAgent = [originalUserAgent, userAgent].joined(separator: " ")
+            }
+            else {
+                webView?.customUserAgent = userAgent
+            }
+        }
         
         if let url = url {
             load(url)
