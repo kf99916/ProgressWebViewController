@@ -385,6 +385,30 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
+    func checkRequestCookies(_ request: URLRequest, cookies: [HTTPCookie]) -> Bool {
+        if cookies.count <= 0 {
+            return true
+        }
+        guard let headerFields = request.allHTTPHeaderFields, let cookieString = headerFields[cookieKey] else {
+            return false
+        }
+        
+        let requestCookies = cookieString.components(separatedBy: ";").map {
+            $0.trimmingCharacters(in: .whitespacesAndNewlines).split(separator: "=", maxSplits: 1).map(String.init)
+        }
+        
+        var valid = false
+        for cookie in cookies {
+            valid = requestCookies.filter {
+                $0[0] == cookie.name && $0[1] == cookie.value
+                }.count > 0
+            if !valid {
+                break
+            }
+        }
+        return valid
+    }
+    
     func openURLWithApp(_ url: URL) -> Bool {
         let application = UIApplication.shared
         if application.canOpenURL(url) {
@@ -516,6 +540,13 @@ extension ProgressWebViewController: WKNavigationDelegate {
         }
    
         if handleURLWithApp(url, targetFrame: navigationAction.targetFrame) {
+            actionPolicy = .cancel
+            return
+        }
+        
+        // Ensure all available cookies are set in the navigation request
+        if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
+            load(url)
             actionPolicy = .cancel
             return
         }
