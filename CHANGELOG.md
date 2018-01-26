@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.6.1
+
+* Ensure all available cookies are set in the navigation request.
+
 ## Version 1.6.0
 
 * Reload url if cookies or headers are changed.
