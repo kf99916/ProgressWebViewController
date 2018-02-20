@@ -20,6 +20,7 @@ let cookieKey = "Cookie"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
 }
 
 open class ProgressWebViewController: UIViewController {
@@ -553,6 +554,20 @@ extension ProgressWebViewController: WKNavigationDelegate {
         
         if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
+        }
+    }
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        var responsePolicy: WKNavigationResponsePolicy = .allow
+        defer {
+            decisionHandler(responsePolicy)
+        }
+        guard let url = navigationResponse.response.url, !url.isFileURL else {
+            return
+        }
+        
+        if let result = delegate?.progressWebViewController?(self, decidePolicy: url, response: navigationResponse.response) {
+            responsePolicy = result ? .allow : .cancel
         }
     }
 }
