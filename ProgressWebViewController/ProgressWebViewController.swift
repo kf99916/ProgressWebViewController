@@ -27,6 +27,7 @@ open class ProgressWebViewController: UIViewController {
     open var url: URL?
     open var bypassedSSLHosts: [String]?
     open var userAgent: String?
+    open var disableZoom = false
     open var urlsHandledByApp = [
         "hosts": ["itunes.apple.com"],
         "schemes": ["tel", "mailto", "sms"],
@@ -108,6 +109,7 @@ open class ProgressWebViewController: UIViewController {
         if websiteTitleInNavigationBar {
             webView?.removeObserver(self, forKeyPath: titleKeyPath)
         }
+        webView?.scrollView.delegate = nil
     }
     
     override open func loadView() {
@@ -116,6 +118,7 @@ open class ProgressWebViewController: UIViewController {
         
         webView.uiDelegate = self
         webView.navigationDelegate = self
+        webView.scrollView.delegate = self
         
         webView.allowsBackForwardNavigationGestures = true
         webView.isMultipleTouchEnabled = true
@@ -569,5 +572,11 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if let result = delegate?.progressWebViewController?(self, decidePolicy: url, response: navigationResponse.response) {
             responsePolicy = result ? .allow : .cancel
         }
+    }
+}
+
+extension ProgressWebViewController: UIScrollViewDelegate {
+    public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return disableZoom ? nil : scrollView.subviews[0]
     }
 }

@@ -45,6 +45,7 @@ class ViewController: UIViewController {
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
+            progressWebViewController.disableZoom = true
             progressWebViewController.url = url
             progressWebViewController.headers = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
