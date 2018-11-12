@@ -542,6 +542,10 @@ extension ProgressWebViewController: WKNavigationDelegate {
         guard let url = navigationAction.request.url, !url.isFileURL else {
             return
         }
+        
+        if let targetFrame = navigationAction.targetFrame, !targetFrame.isMainFrame {
+            return
+        }
    
         if handleURLWithApp(url, targetFrame: navigationAction.targetFrame) {
             actionPolicy = .cancel
@@ -549,7 +553,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         }
         
         // Ensure all available cookies are set in the navigation request
-        if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
+        if navigationAction.navigationType != .backForward, url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
             load(url)
             actionPolicy = .cancel
             return
