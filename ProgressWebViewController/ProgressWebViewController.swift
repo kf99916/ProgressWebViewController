@@ -127,9 +127,8 @@ open class ProgressWebViewController: UIViewController {
     
     deinit {
         webView?.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
-        if websiteTitleInNavigationBar {
-            webView?.removeObserver(self, forKeyPath: titleKeyPath)
-        }
+        webView?.removeObserver(self, forKeyPath: titleKeyPath)
+
         webView?.scrollView.delegate = nil
     }
     
@@ -145,9 +144,7 @@ open class ProgressWebViewController: UIViewController {
         webView.isMultipleTouchEnabled = true
         
         webView.addObserver(self, forKeyPath: estimatedProgressKeyPath, options: .new, context: nil)
-        if websiteTitleInNavigationBar {
-            webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
-        }
+        webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
         
         view = webView
         self.webView = webView
@@ -222,7 +219,9 @@ open class ProgressWebViewController: UIViewController {
                 })
             }
         case titleKeyPath?:
-            navigationItem.title = webView?.title
+            if websiteTitleInNavigationBar || URL(string: navigationItem.title ?? "")?.appendingPathComponent("") == url?.appendingPathComponent("") {
+                navigationItem.title = webView?.title
+            }
         default:
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }

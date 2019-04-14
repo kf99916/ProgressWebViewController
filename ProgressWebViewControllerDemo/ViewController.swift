@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
-        guard let identifier = segue.identifier, let url = URL(string: "https://www.google.com.tw") else {
+        guard let identifier = segue.identifier, let url = URL(string: "https://www.google.com") else {
             return
         }
 
@@ -39,7 +39,7 @@ class ViewController: UIViewController {
             progressWebViewController.bypassedSSLHosts = [url.host!]
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
-            progressWebViewController.navigationItem.title = "Apple Website"
+            progressWebViewController.navigationItem.title = "Google Website"
             progressWebViewController.leftNavigaionBarItemTypes = [.reload]
             progressWebViewController.toolbarItemTypes = [.back, .forward, .activity]
         case "Show":
