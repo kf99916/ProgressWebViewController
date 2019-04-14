@@ -29,6 +29,7 @@ open class ProgressWebViewController: UIViewController {
     open var userAgent: String?
     open var disableZoom = false
     open var navigationWay = NavigationWay.browser
+    open var pullToRefresh = false
     open var urlsHandledByApp = [
         "hosts": ["itunes.apple.com"],
         "schemes": ["tel", "mailto", "sms"],
@@ -69,6 +70,7 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView?
     fileprivate var progressView: UIProgressView?
+    fileprivate var refreshControl: UIRefreshControl?
     
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
@@ -111,6 +113,7 @@ open class ProgressWebViewController: UIViewController {
         self.userAgent = progressWebViewController.userAgent
         self.disableZoom = progressWebViewController.disableZoom
         self.navigationWay = progressWebViewController.navigationWay
+        self.pullToRefresh = progressWebViewController.pullToRefresh
         self.urlsHandledByApp = progressWebViewController.urlsHandledByApp
         self.cookies = progressWebViewController.cookies
         self.headers = progressWebViewController.headers
@@ -163,6 +166,9 @@ open class ProgressWebViewController: UIViewController {
         
         setUpProgressView()
         addBarButtonItems()
+        if pullToRefresh {
+            setUpRefreshControl()
+        }
         
         if let userAgent = userAgent {
             if let originalUserAgent = originalUserAgent {
@@ -282,6 +288,18 @@ fileprivate extension ProgressWebViewController {
         progressView.trackTintColor = UIColor(white: 1, alpha: 0)
         self.progressView = progressView
         updateProgressViewFrame()
+    }
+    
+    func setUpRefreshControl() {
+        guard refreshControl == nil else {
+            return
+        }
+        
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshWebView(sender:)), for: UIControl.Event.valueChanged)
+        webView?.scrollView.addSubview(refreshControl)
+        webView?.scrollView.bounces = true
+        self.refreshControl = refreshControl
     }
     
     func updateProgressViewFrame() {
@@ -458,47 +476,6 @@ fileprivate extension ProgressWebViewController {
         
         return tryToOpenURLWithApp ? openURLWithApp(url) : false
     }
-    
-    @objc func backDidClick(sender: AnyObject) {
-        webView?.goBack()
-    }
-    
-    @objc func forwardDidClick(sender: AnyObject) {
-        webView?.goForward()
-    }
-    
-    @objc func reloadDidClick(sender: AnyObject) {
-        webView?.stopLoading()
-        if webView?.url != nil {
-            webView?.reload()
-        }
-        else if let url = url {
-            load(url)
-        }
-    }
-    
-    @objc func stopDidClick(sender: AnyObject) {
-        webView?.stopLoading()
-    }
-    
-    @objc func activityDidClick(sender: AnyObject) {
-        guard let url = url else {
-            return
-        }
-        
-        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
-        present(activityViewController, animated: true, completion: nil)
-    }
-    
-    @objc func doneDidClick(sender: AnyObject) {
-        var canDismiss = true
-        if let url = url {
-            canDismiss = delegate?.progressWebViewController?(self, canDismiss: url) ?? true
-        }
-        if canDismiss {
-            dismiss(animated: true, completion: nil)
-        }
-    }
 }
 
 // MARK: - WKUIDelegate
@@ -519,6 +496,9 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         updateBarButtonItems()
         updateProgressViewFrame()
+        if let refreshControl = refreshControl {
+            refreshControl.endRefreshing()
+        }
         if let url = webView.url {
             self.url = url
             delegate?.progressWebViewController?(self, didFinish: url)
@@ -612,5 +592,54 @@ extension ProgressWebViewController: WKNavigationDelegate {
 extension ProgressWebViewController: UIScrollViewDelegate {
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return disableZoom ? nil : scrollView.subviews[0]
+    }
+}
+
+// MARK: - @objc
+@objc extension ProgressWebViewController {
+    func backDidClick(sender: AnyObject) {
+        webView?.goBack()
+    }
+    
+    func forwardDidClick(sender: AnyObject) {
+        webView?.goForward()
+    }
+    
+    func reloadDidClick(sender: AnyObject) {
+        webView?.stopLoading()
+        if webView?.url != nil {
+            webView?.reload()
+        }
+        else if let url = url {
+            load(url)
+        }
+    }
+    
+    func stopDidClick(sender: AnyObject) {
+        webView?.stopLoading()
+    }
+    
+    func activityDidClick(sender: AnyObject) {
+        guard let url = url else {
+            return
+        }
+        
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        present(activityViewController, animated: true, completion: nil)
+    }
+    
+    func doneDidClick(sender: AnyObject) {
+        var canDismiss = true
+        if let url = url {
+            canDismiss = delegate?.progressWebViewController?(self, canDismiss: url) ?? true
+        }
+        if canDismiss {
+            dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    func refreshWebView(sender: UIRefreshControl) {
+        sender.beginRefreshing()
+        reloadDidClick(sender: sender)
     }
 }
