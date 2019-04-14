@@ -24,6 +24,11 @@ public enum NavigationBarPosition {
     case right
 }
 
+public enum NavigationWay {
+    case browser
+    case push
+}
+
 @objc public enum NavigationType: Int {
     case linkActivated
     case formSubmitted

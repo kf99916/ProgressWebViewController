@@ -28,6 +28,7 @@ open class ProgressWebViewController: UIViewController {
     open var bypassedSSLHosts: [String]?
     open var userAgent: String?
     open var disableZoom = false
+    open var navigationWay = NavigationWay.browser
     open var urlsHandledByApp = [
         "hosts": ["itunes.apple.com"],
         "schemes": ["tel", "mailto", "sms"],
@@ -103,6 +104,23 @@ open class ProgressWebViewController: UIViewController {
     lazy fileprivate var flexibleSpaceBarButtonItem: UIBarButtonItem = {
         return UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     }()
+    
+    convenience init(_ progressWebViewController: ProgressWebViewController) {
+        self.init()
+        self.bypassedSSLHosts = progressWebViewController.bypassedSSLHosts
+        self.userAgent = progressWebViewController.userAgent
+        self.disableZoom = progressWebViewController.disableZoom
+        self.navigationWay = progressWebViewController.navigationWay
+        self.urlsHandledByApp = progressWebViewController.urlsHandledByApp
+        self.cookies = progressWebViewController.cookies
+        self.headers = progressWebViewController.headers
+        self.tintColor = progressWebViewController.tintColor
+        self.websiteTitleInNavigationBar = progressWebViewController.websiteTitleInNavigationBar
+        self.doneBarButtonItemPosition = progressWebViewController.doneBarButtonItemPosition
+        self.leftNavigaionBarItemTypes = progressWebViewController.leftNavigaionBarItemTypes
+        self.rightNavigaionBarItemTypes = progressWebViewController.rightNavigaionBarItemTypes
+        self.toolbarItemTypes = progressWebViewController.toolbarItemTypes
+    }
     
     deinit {
         webView?.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
@@ -552,15 +570,27 @@ extension ProgressWebViewController: WKNavigationDelegate {
             return
         }
         
-        // Ensure all available cookies are set in the navigation request
-        if navigationAction.navigationType != .backForward, url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
-            load(url)
-            actionPolicy = .cancel
-            return
-        }
-        
         if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
+        }
+        
+        switch navigationAction.navigationType {
+        case .linkActivated:
+            if navigationWay == .push {
+                let progressWebViewController = ProgressWebViewController(self)
+                progressWebViewController.url = url
+                navigationController?.pushViewController(progressWebViewController, animated: true)
+                actionPolicy = .cancel
+            }
+            else {
+                fallthrough
+            }
+        default:
+            // Ensure all available cookies are set in the navigation request
+            if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
+                load(url)
+                actionPolicy = .cancel
+            }
         }
     }
     

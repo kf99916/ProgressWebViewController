@@ -46,6 +46,8 @@ class ViewController: UIViewController {
                 return
             }
             progressWebViewController.disableZoom = true
+            progressWebViewController.navigationWay = .push
+            progressWebViewController.toolbarItemTypes = [.reload, .activity]
             progressWebViewController.url = url
             progressWebViewController.headers = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
