@@ -554,6 +554,8 @@ extension ProgressWebViewController: WKNavigationDelegate {
         }
         
         switch navigationAction.navigationType {
+        case .formSubmitted:
+            fallthrough
         case .linkActivated:
             if navigationWay == .push {
                 let progressWebViewController = ProgressWebViewController(self)
