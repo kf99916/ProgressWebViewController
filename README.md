@@ -69,7 +69,9 @@ A view controller with WKWebView and a progress bar in the navigation bar
 `var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)  
 `var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)  
 `var rightNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the right navigation bar (default `[]`)  
-`var toolbarItemTypes: [BarButtonItemType]` configure the bar button items in the toolbar of navigation controller (default `[.back, .forward, .reload, .activity]`)
+`var toolbarItemTypes: [BarButtonItemType]` configure the bar button items in the toolbar of navigation controller (default `[.back, .forward, .reload, .activity]`)   
+`var navigationWay: [NavigationWay]` configure the navigation way for clicking links (default `.browser`)   
+`var pullToRefresh: Bool` enable/disable the pull-to-refresh (default `false`)
 
 #### Subclassing
 
@@ -128,6 +130,17 @@ enum NavigationBarPosition {
     case none
     case left
     case right
+}
+```
+
+### NavigationWay
+
+The enum for navigation way
+
+```swift
+enum NavigationWay {
+    case browser
+    case push
 }
 ```
 
