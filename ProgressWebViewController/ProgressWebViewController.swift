@@ -123,6 +123,7 @@ open class ProgressWebViewController: UIViewController {
         self.leftNavigaionBarItemTypes = progressWebViewController.leftNavigaionBarItemTypes
         self.rightNavigaionBarItemTypes = progressWebViewController.rightNavigaionBarItemTypes
         self.toolbarItemTypes = progressWebViewController.toolbarItemTypes
+        self.delegate = progressWebViewController.delegate
     }
     
     deinit {
@@ -551,6 +552,9 @@ extension ProgressWebViewController: WKNavigationDelegate {
         
         if let navigationType = NavigationType(rawValue: navigationAction.navigationType.rawValue), let result = delegate?.progressWebViewController?(self, decidePolicy: url, navigationType: navigationType) {
             actionPolicy = result ? .allow : .cancel
+            if actionPolicy == .cancel {
+                return
+            }
         }
         
         switch navigationAction.navigationType {
@@ -586,6 +590,10 @@ extension ProgressWebViewController: WKNavigationDelegate {
         
         if let result = delegate?.progressWebViewController?(self, decidePolicy: url, response: navigationResponse.response) {
             responsePolicy = result ? .allow : .cancel
+        }
+        
+        if navigationWay == .push, responsePolicy == .cancel, let webViewController = navigationController?.topViewController as? ProgressWebViewController, webViewController.url?.appendingPathComponent("") == url.appendingPathComponent("") {
+            navigationController?.popViewController(animated: true)
         }
     }
 }
