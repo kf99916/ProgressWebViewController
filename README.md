@@ -9,24 +9,33 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 [![Platform](https://img.shields.io/cocoapods/p/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController)
 [![GitHub license](https://img.shields.io/github/license/kf99916/ProgressWebViewController.svg)](https://github.com/kf99916/ProgressWebViewController/blob/master/LICENSE)
 
-![ProgressWebViewController](/screenshots/progressWebViewController.png "ProgressWebViewController") ![ProgressWebViewController](/screenshots/progressWebViewController2.png "ProgressWebViewController")
+![ProgressWebViewController](/screenshots/progressWebViewController.png 'ProgressWebViewController') ![ProgressWebViewController](/screenshots/progressWebViewController2.png 'ProgressWebViewController')
 
 ## Features
 
-* :white_check_mark: Progress bar in navigation bar
-* :white_check_mark: Bypass SSL according to the assigned hosts.( i.e., you can access the self-signed certificate websites with ProgressWebViewController)
-* :white_check_mark: Customize bar button items
-* :white_check_mark: Assign cookies to the web view
-* :white_check_mark: Browse the local html files
-* :white_check_mark: Support large titles for navigation bars in iOS 11
-* :white_check_mark: Support custom headers
-* :white_check_mark: Support custom user agent
-* :white_check_mark: Open the special urls including the app store, tel, mailto, sms, and _blank with other apps
+- :white_check_mark: Progress bar in navigation bar
+- :white_check_mark: Bypass SSL according to the assigned hosts.( i.e., you can access the self-signed certificate websites with ProgressWebViewController)
+- :white_check_mark: Customize bar button items
+- :white_check_mark: Assign cookies to the web view
+- :white_check_mark: Browse the local html files
+- :white_check_mark: Support large titles for navigation bars in iOS 11
+- :white_check_mark: Support custom headers
+- :white_check_mark: Support custom user agent
+- :white_check_mark: Open the special urls including the app store, tel, mailto, sms, and \_blank with other apps
+- :white_check_mark: Support the pull-to-refresh
+- :white_check_mark: Support the push navigation way
 
 ## Requirements
 
-* iOS 9.0 or higher
-* Swift 4.0 or higher
+- iOS 9.0 or higher
+
+### v1.7.0-
+
+- Swift 4
+
+### v1.8.0
+
+- Swift 5
 
 ## Installation
 
@@ -52,14 +61,10 @@ A view controller with WKWebView and a progress bar in the navigation bar
 `var tintColor: UIColor?` the tint color for the progress bar, navigation bar, and tool bar  
 `var delegate: ProgressWebViewControllerDelegate?` the delegate for ProgressWebViewController  
 `var bypassedSSLHosts: [String]?` the bypassed SSL hosts. The hosts must also be disabled in the App Transport Security.  
-`var cookies: [HTTPCookie]?` the assigned cookies   
-`var headers: [String: String]?` the custom headers   
-`var userAgent: String?` the custom user agent    
-`var urlsHandledByApp: [String: Any]` configure the urls handled by other apps (default `[
-        "hosts": ["itunes.apple.com"],
-        "schemes": ["tel", "mailto", "sms"],
-        "_blank": true
-        ]`)   
+`var cookies: [HTTPCookie]?` the assigned cookies  
+`var headers: [String: String]?` the custom headers  
+`var userAgent: String?` the custom user agent  
+`var urlsHandledByApp: [String: Any]` configure the urls handled by other apps (default `[ "hosts": ["itunes.apple.com"], "schemes": ["tel", "mailto", "sms"], "_blank": true ]`)  
 `var websiteTitleInNavigationBar = true` show the website title in the navigation bar  
 `var doneBarButtonItemPosition: NavigationBarPosition` the position for the done bar button item. the done barbutton item is added automatically if the view controller is presented.(default `.left`)  
 `var leftNavigaionBarItemTypes: [BarButtonItemType]` configure the bar button items in the left navigation bar (default `[]`)  
@@ -74,7 +79,7 @@ You should set up the webview in `loadView()` and set up others in `viewDidLoad(
 class MyWebViewController: ProgressWebViewController {
     override open func loadView() {
         super.loadView()
-        
+
         // set up webview, including cookies, headers, user agent, and so on.
     }
 

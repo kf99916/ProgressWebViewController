@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.8
+
+- Migrate to Xcode 10.2 and Swift 5.
+- Support the push navigation way.
+- Support pull-to-refresh to reload the web view.
+
 ## Version 1.7
 
 - Add delegate: progressWebViewController(controller:decidePolicy:response:).
