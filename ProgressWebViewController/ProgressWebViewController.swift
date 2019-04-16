@@ -246,6 +246,15 @@ public extension ProgressWebViewController {
             webView?.go(to: firstPageItem)
         }
     }
+    
+    func scrollToTop(animated: Bool) {
+        var offsetY: CGFloat = 0
+        if let navigationController = navigationController {
+            offsetY -= navigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
+        }
+
+        webView?.scrollView.setContentOffset(CGPoint(x: 0, y: offsetY), animated: animated)
+    }
 }
 
 // MARK: - Fileprivate Methods
