@@ -247,13 +247,27 @@ public extension ProgressWebViewController {
         }
     }
     
-    func scrollToTop(animated: Bool) {
+    func scrollToTop(animated: Bool, refresh: Bool = false) {
         var offsetY: CGFloat = 0
         if let navigationController = navigationController {
             offsetY -= navigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
         }
+        if refresh, let refreshControl = refreshControl {
+            offsetY -= refreshControl.frame.size.height
+        }
 
         webView?.scrollView.setContentOffset(CGPoint(x: 0, y: offsetY), animated: animated)
+        
+        if refresh, let refreshControl = refreshControl {
+            refreshWebView(sender: refreshControl)
+        }
+    }
+    
+    func isScrollToTop() -> Bool {
+        guard let scrollView = webView?.scrollView else {
+            return false
+        }
+        return scrollView.contentOffset.y <= CGFloat(0)
     }
 }
 
