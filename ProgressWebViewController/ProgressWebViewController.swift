@@ -60,6 +60,15 @@ open class ProgressWebViewController: UIViewController {
     }
     
     open var delegate: ProgressWebViewControllerDelegate?
+    open var scrollViewDelegate: UIScrollViewDelegate? {
+        get {
+            return webView?.scrollView.delegate
+        }
+        
+        set(delegate) {
+            webView?.scrollView.delegate = delegate
+        }
+    }
     
     open var tintColor: UIColor?
     open var websiteTitleInNavigationBar = true
