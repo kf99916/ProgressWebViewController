@@ -75,6 +75,8 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
+    fileprivate var scrollToRefresh = false
+    
     lazy fileprivate var originalUserAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")
 
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
@@ -256,11 +258,8 @@ public extension ProgressWebViewController {
             offsetY -= refreshControl.frame.size.height
         }
 
+        scrollToRefresh = refresh
         webView?.scrollView.setContentOffset(CGPoint(x: 0, y: offsetY), animated: animated)
-        
-        if refresh, let refreshControl = refreshControl {
-            refreshWebView(sender: refreshControl)
-        }
     }
     
     func isScrollToTop() -> Bool {
@@ -624,6 +623,13 @@ extension ProgressWebViewController: WKNavigationDelegate {
 extension ProgressWebViewController: UIScrollViewDelegate {
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return disableZoom ? nil : scrollView.subviews[0]
+    }
+    
+    public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if scrollToRefresh, let refreshControl = refreshControl {
+            refreshWebView(sender: refreshControl)
+        }
+        scrollToRefresh = false
     }
 }
 
