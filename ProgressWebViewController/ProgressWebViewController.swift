@@ -357,7 +357,7 @@ fileprivate extension ProgressWebViewController {
             }
         }
         
-        navigationItem.leftBarButtonItems = leftNavigaionBarItemTypes.map {
+        navigationItem.leftBarButtonItems = navigationItem.leftBarButtonItems ?? [] + leftNavigaionBarItemTypes.map {
             barButtonItemType in
             if let barButtonItem = barButtonItems[barButtonItemType] {
                 return barButtonItem
@@ -365,7 +365,7 @@ fileprivate extension ProgressWebViewController {
             return UIBarButtonItem()
         }
         
-        navigationItem.rightBarButtonItems = rightNavigaionBarItemTypes.map {
+        navigationItem.rightBarButtonItems = navigationItem.rightBarButtonItems ?? [] + rightNavigaionBarItemTypes.map {
             barButtonItemType in
             if let barButtonItem = barButtonItems[barButtonItemType] {
                 return barButtonItem
