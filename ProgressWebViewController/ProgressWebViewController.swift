@@ -23,6 +23,10 @@ let cookieKey = "Cookie"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
 }
 
+@objc public protocol ProgressWebViewControllerScrollViewDelegate {
+    @objc optional func scrollViewDidScroll(_ scrollView: UIScrollView)
+}
+
 open class ProgressWebViewController: UIViewController {
     open var url: URL?
     open var bypassedSSLHosts: [String]?
@@ -60,15 +64,7 @@ open class ProgressWebViewController: UIViewController {
     }
     
     open var delegate: ProgressWebViewControllerDelegate?
-    open var scrollViewDelegate: UIScrollViewDelegate? {
-        get {
-            return webView?.scrollView.delegate
-        }
-        
-        set(delegate) {
-            webView?.scrollView.delegate = delegate
-        }
-    }
+    open var scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate?
     
     open var tintColor: UIColor?
     open var websiteTitleInNavigationBar = true
@@ -639,6 +635,10 @@ extension ProgressWebViewController: UIScrollViewDelegate {
             refreshWebView(sender: refreshControl)
         }
         scrollToRefresh = false
+    }
+    
+    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollViewDelegate?.scrollViewDidScroll?(scrollView)
     }
 }
 
