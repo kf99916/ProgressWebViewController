@@ -538,8 +538,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if let refreshControl = refreshControl {
             refreshControl.endRefreshing()
         }
-        if let url = webView.url {
-            self.url = url
+        if let url = url {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
@@ -550,8 +549,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if let refreshControl = refreshControl {
             refreshControl.endRefreshing()
         }
-        if let url = webView.url {
-            self.url = url
+        if let url = url {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
