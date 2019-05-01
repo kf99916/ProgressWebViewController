@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.8.1
+
+- Expose the delegate for scroll view.
+- Add functionality to scroll to top.
+- You can add another bar button items into the navigation bar.
+- Fix issues.
+
 ## Version 1.8
 
 - Migrate to Xcode 10.2 and Swift 5.
