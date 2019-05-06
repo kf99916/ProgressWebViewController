@@ -114,7 +114,7 @@ open class ProgressWebViewController: UIViewController {
         return UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
     }()
     
-    convenience init(_ progressWebViewController: ProgressWebViewController) {
+    public convenience init(_ progressWebViewController: ProgressWebViewController) {
         self.init()
         self.bypassedSSLHosts = progressWebViewController.bypassedSSLHosts
         self.userAgent = progressWebViewController.userAgent
