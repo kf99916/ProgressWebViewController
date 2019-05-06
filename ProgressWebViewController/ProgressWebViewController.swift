@@ -690,7 +690,10 @@ extension ProgressWebViewController: UIScrollViewDelegate {
     }
     
     func refreshWebView(sender: UIRefreshControl) {
-        sender.beginRefreshing()
-        reloadDidClick(sender: sender)
+        let isLoading = webView?.isLoading ?? false
+        if !isLoading {
+            sender.beginRefreshing()
+            reloadDidClick(sender: sender)
+        }
     }
 }
