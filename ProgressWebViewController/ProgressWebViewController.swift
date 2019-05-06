@@ -15,12 +15,12 @@ let cookieKey = "Cookie"
 
 @objc public protocol ProgressWebViewControllerDelegate {
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, canDismiss url: URL) -> Bool
-    
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didStart url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
+    @objc optional func initPushedProgressWebViewController(url: URL) -> ProgressWebViewController
 }
 
 @objc public protocol ProgressWebViewControllerScrollViewDelegate {
@@ -593,7 +593,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
             fallthrough
         case .linkActivated:
             if navigationWay == .push {
-                let progressWebViewController = ProgressWebViewController(self)
+                let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
                 progressWebViewController.url = url
                 navigationController?.pushViewController(progressWebViewController, animated: true)
                 actionPolicy = .cancel
