@@ -105,6 +105,7 @@ The delegate for ProgressWebViwController
 `optional func progressWebViewController(_ controller: ProgressWebViewController, didFinish url: URL)`  
 `optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)`  
 `optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL) -> Bool`
+`optional func initPushedProgressWebViewController(url: URL) -> ProgressWebViewController`
 
 ### ProgressWebViewControllerScrollViewDelegate
 

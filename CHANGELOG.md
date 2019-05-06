@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.8.2
+
+- Customize the web view for push navigation.
+- Fix refresh control issue.
+
 ## Version 1.8.1
 
 - Expose the delegate for scroll view.
