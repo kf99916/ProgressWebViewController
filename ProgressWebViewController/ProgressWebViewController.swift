@@ -592,6 +592,12 @@ extension ProgressWebViewController: WKNavigationDelegate {
         case .formSubmitted:
             fallthrough
         case .linkActivated:
+            if let fragment = url.fragment {
+                let removedFramgnetURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: ""))
+                if removedFramgnetURL == self.url {
+                    fallthrough
+                }
+            }
             if navigationWay == .push {
                 let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
                 progressWebViewController.url = url
