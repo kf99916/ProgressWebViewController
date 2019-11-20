@@ -39,8 +39,24 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 
 ## Installation
 
+### Swift Package Manager
+
+The [Swift Package Manager](https://swift.org/package-manager/) is a tool for automating the distribution of Swift code and is integrated into the `swift` compiler.
+
+Once you have your Swift package set up, adding ProgressWebViewController as a dependency is as easy as adding it to the `dependencies` value of your `Package.swift`.
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/kf99916/ProgressWebViewController.git")
+]
+```
+
+### CocoaPods
+
+[CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate ProgressWebViewController into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
 ```ruby
-pod "ProgressWebViewController"
+pod 'ProgressWebViewController'
 ```
 
 ## Usage

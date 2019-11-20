@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.9.0
+
+- Support Swift Package Manager
+- Ignore fragment for push navigation way
+
 ## Version 1.8.2
 
 - Customize the web view for push navigation.
