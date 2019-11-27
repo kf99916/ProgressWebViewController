@@ -503,6 +503,10 @@ fileprivate extension ProgressWebViewController {
         
         return tryToOpenURLWithApp ? openURLWithApp(url) : false
     }
+    
+    func isBlank(url: URL) -> Bool {
+        return url.absoluteString == "about:blank"
+    }
 }
 
 // MARK: - WKUIDelegate
@@ -516,7 +520,9 @@ extension ProgressWebViewController: WKNavigationDelegate {
         updateBarButtonItems()
         updateProgressViewFrame()
         if let url = webView.url {
-            self.url = url
+            if !isBlank(url:url) {
+                self.url = url
+            }
             delegate?.progressWebViewController?(self, didStart: url)
         }
     }
@@ -527,7 +533,9 @@ extension ProgressWebViewController: WKNavigationDelegate {
             refreshControl.endRefreshing()
         }
         if let url = webView.url {
-            self.url = url
+            if !isBlank(url:url) {
+                self.url = url
+            }
             delegate?.progressWebViewController?(self, didFinish: url)
         }
     }
@@ -664,7 +672,7 @@ extension ProgressWebViewController: UIScrollViewDelegate {
     
     func reloadDidClick(sender: AnyObject) {
         webView?.stopLoading()
-        if webView?.url != nil {
+        if let url = webView?.url, !isBlank(url:url) {
             webView?.reload()
         }
         else if let url = url {
