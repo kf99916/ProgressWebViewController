@@ -248,6 +248,12 @@ public extension ProgressWebViewController {
         }
     }
     
+    func load(htmlString: String, baseURL: URL?) {
+        DispatchQueue.main.async {
+            self.webView?.loadHTMLString(htmlString, baseURL: baseURL)
+        }
+    }
+    
     func goBackToFirstPage() {
         if let firstPageItem = webView?.backForwardList.backList.first {
             webView?.go(to: firstPageItem)
