@@ -281,7 +281,10 @@ public extension ProgressWebViewController {
     }
     
     func clearCache(completionHandler: @escaping () -> Void) {
-        let websiteDataTypes = Set<String>([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
+        var websiteDataTypes = Set<String>([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeOfflineWebApplicationCache])
+        if #available(iOS 11.3, *) {
+            websiteDataTypes.insert(WKWebsiteDataTypeFetchCache)
+        }
         WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: Date(timeIntervalSince1970: 0), completionHandler: completionHandler)
     }
 }
