@@ -279,6 +279,11 @@ public extension ProgressWebViewController {
         }
         return scrollView.contentOffset.y <= CGFloat(0)
     }
+    
+    func clearCache(completionHandler: @escaping () -> Void) {
+        let websiteDataTypes = Set<String>([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
+        WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: Date(timeIntervalSince1970: 0), completionHandler: completionHandler)
+    }
 }
 
 // MARK: - Fileprivate Methods
