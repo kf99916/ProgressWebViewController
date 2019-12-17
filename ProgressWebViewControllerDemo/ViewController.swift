@@ -35,7 +35,6 @@ class ViewController: UIViewController {
             }
 
             progressWebViewController.url = url
-            progressWebViewController.pullToRefresh = true
             progressWebViewController.bypassedSSLHosts = [url.host!]
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
@@ -50,6 +49,7 @@ class ViewController: UIViewController {
             progressWebViewController.navigationWay = .push
             progressWebViewController.toolbarItemTypes = [.reload, .activity]
             progressWebViewController.url = url
+            progressWebViewController.pullToRefresh = true
             progressWebViewController.headers = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
             progressWebViewController.cookies = [
