@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 1.10.0
+
+- Remove UIWebView APIs completely
+- Add functionality:
+  - clear caches
+  - load html string
+
 ## Version 1.9.0
 
 - Support Swift Package Manager
