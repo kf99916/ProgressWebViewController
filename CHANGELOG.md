@@ -6,6 +6,7 @@
 - Add functionality:
   - clear caches
   - load html string
+  - evaluate JavaScript
 
 ## Version 1.9.0
 
