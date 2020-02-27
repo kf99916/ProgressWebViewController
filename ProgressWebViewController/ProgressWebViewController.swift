@@ -293,6 +293,10 @@ public extension ProgressWebViewController {
         }
         WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: Date(timeIntervalSince1970: 0), completionHandler: completionHandler)
     }
+    
+    func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+        webView?.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
+    }
 }
 
 // MARK: - Fileprivate Methods
