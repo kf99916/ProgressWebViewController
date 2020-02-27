@@ -81,8 +81,6 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
     fileprivate var scrollToRefresh = false
-    
-    lazy fileprivate var originalUserAgent = UIWebView().stringByEvaluatingJavaScript(from: "navigator.userAgent")
 
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
@@ -176,19 +174,27 @@ open class ProgressWebViewController: UIViewController {
         }
         
         if let userAgent = userAgent {
-            if let originalUserAgent = originalUserAgent {
-                webView?.customUserAgent = [originalUserAgent, userAgent].joined(separator: " ")
-            }
-            else {
-                webView?.customUserAgent = userAgent
+            webView?.evaluateJavaScript("navigator.userAgent") { [weak self] result, error in
+                guard let weakSelf = self else {
+                    return
+                }
+                
+                defer {
+                    if let url = weakSelf.url {
+                        weakSelf.load(url)
+                    }
+                }
+                
+                guard error == nil, let originalUserAgent = result as? String else {
+                    weakSelf.webView?.customUserAgent = userAgent
+                    return
+                }
+                
+                weakSelf.webView?.customUserAgent = String(format: "%@ %@", originalUserAgent, userAgent)
             }
         }
-        
-        if let url = url {
+        else if let url = url {
             load(url)
-        }
-        else {
-            print("[ProgressWebViewController][Error] NULL URL")
         }
     }
     
