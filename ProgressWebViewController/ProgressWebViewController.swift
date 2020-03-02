@@ -297,6 +297,14 @@ public extension ProgressWebViewController {
     func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
         webView?.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
+    
+    func loadBlankPage() {
+        guard let url = URL(string:"about:blank") else {
+            return
+        }
+        self.url = url
+        load(url)
+    }
 }
 
 // MARK: - Fileprivate Methods
