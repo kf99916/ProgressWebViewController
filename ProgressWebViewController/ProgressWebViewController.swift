@@ -81,6 +81,7 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
     fileprivate var scrollToRefresh = false
+    fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
 
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
@@ -167,6 +168,10 @@ open class ProgressWebViewController: UIViewController {
             previousToolbarState = (navigationController.toolbar.tintColor, navigationController.toolbar.isHidden)
         }
         
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(webViewDidTap(sender:)))
+        tapGesture.delegate = self
+        webView?.addGestureRecognizer(tapGesture)
+        
         setUpProgressView()
         addBarButtonItems()
         if pullToRefresh {
@@ -240,6 +245,13 @@ open class ProgressWebViewController: UIViewController {
             super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
         }
     }
+    
+    // Reference: https://medium.com/swlh/popover-menu-over-cards-containing-webkit-views-on-ios-13-a16705aff8af
+    // https://stackoverflow.com/questions/58164583/wkwebview-with-the-new-ios13-modal-crash-when-a-file-picker-is-invoked
+    override open func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
+      setUIDocumentMenuViewControllerSoureViewsIfNeeded(viewControllerToPresent)
+      super.present(viewControllerToPresent, animated: flag, completion: completion)
+    }
 }
 
 // MARK: - Public Methods
@@ -304,6 +316,14 @@ public extension ProgressWebViewController {
         }
         self.url = url
         load(url)
+    }
+    
+    func setUIDocumentMenuViewControllerSoureViewsIfNeeded(_ viewControllerToPresent: UIViewController) {
+        viewControllerToPresent.popoverPresentationController?.sourceView = view
+        if lastTapPosition == .zero {
+            lastTapPosition = view.center
+        }
+        viewControllerToPresent.popoverPresentationController?.sourceRect = CGRect(origin: lastTapPosition, size: CGSize(width: 0, height: 0))
     }
 }
 
@@ -692,6 +712,12 @@ extension ProgressWebViewController: UIScrollViewDelegate {
     }
 }
 
+extension ProgressWebViewController: UIGestureRecognizerDelegate {
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+}
+
 // MARK: - @objc
 @objc extension ProgressWebViewController {
     func backDidClick(sender: AnyObject) {
@@ -741,5 +767,9 @@ extension ProgressWebViewController: UIScrollViewDelegate {
             sender.beginRefreshing()
             reloadDidClick(sender: sender)
         }
+    }
+    
+    func webViewDidTap(sender: UITapGestureRecognizer) {
+      lastTapPosition = sender.location(in: view)
     }
 }
