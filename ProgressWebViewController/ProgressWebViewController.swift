@@ -141,6 +141,7 @@ open class ProgressWebViewController: UIViewController {
     
     override open func loadView() {
         let webConfiguration = WKWebViewConfiguration()
+        webConfiguration.allowsInlineMediaPlayback = true
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
         
         webView.uiDelegate = self
