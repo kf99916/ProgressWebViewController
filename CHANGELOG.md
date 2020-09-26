@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 1.11.0
+
+- Support video "playinline"
+- Support popoverPresentationController
+- Add loadBlankPage()
+
 ## Version 1.10.0
 
 - Remove UIWebView APIs completely
