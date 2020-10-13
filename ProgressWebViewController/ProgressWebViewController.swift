@@ -560,6 +560,12 @@ fileprivate extension ProgressWebViewController {
     func isBlank(url: URL) -> Bool {
         return url.absoluteString == "about:blank"
     }
+    
+    func pushWebViewController(url: URL) {
+        let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
+        progressWebViewController.url = url
+        navigationController?.pushViewController(progressWebViewController, animated: true)
+    }
 }
 
 // MARK: - WKUIDelegate
@@ -656,22 +662,18 @@ extension ProgressWebViewController: WKNavigationDelegate {
             if let fragment = url.fragment {
                 let removedFramgnetURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: ""))
                 if removedFramgnetURL == self.url {
-                    fallthrough
+                    return
                 }
             }
             if navigationWay == .push {
-                let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
-                progressWebViewController.url = url
-                navigationController?.pushViewController(progressWebViewController, animated: true)
+                pushWebViewController(url: url)
                 actionPolicy = .cancel
+                return
             }
-            else {
-                fallthrough
-            }
+            fallthrough
         default:
-            // Ensure all available cookies are set in the navigation request
-            if url.host == self.url?.host, let cookies = availableCookies, !checkRequestCookies(navigationAction.request, cookies: cookies) {
-                load(url)
+            if navigationAction.targetFrame == nil {
+                pushWebViewController(url: url)
                 actionPolicy = .cancel
             }
         }
