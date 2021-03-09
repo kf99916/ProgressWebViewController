@@ -34,6 +34,7 @@ class ViewController: UIViewController {
                 return
             }
 
+            progressWebViewController.pullToRefresh = true
             progressWebViewController.url = url
             progressWebViewController.bypassedSSLHosts = [url.host!]
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
@@ -45,11 +46,12 @@ class ViewController: UIViewController {
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
             }
+            
+            progressWebViewController.isScrollEnabled = false
             progressWebViewController.disableZoom = true
             progressWebViewController.navigationWay = .push
             progressWebViewController.toolbarItemTypes = [.reload, .activity]
             progressWebViewController.url = url
-            progressWebViewController.pullToRefresh = true
             progressWebViewController.headers = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
             progressWebViewController.cookies = [

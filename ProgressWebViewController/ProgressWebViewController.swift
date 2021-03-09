@@ -63,6 +63,12 @@ open class ProgressWebViewController: UIViewController {
         }
     }
     
+    open var isScrollEnabled = true {
+        didSet {
+            webView?.scrollView.isScrollEnabled = isScrollEnabled
+        }
+    }
+    
     open var delegate: ProgressWebViewControllerDelegate?
     open var scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate?
     
@@ -130,6 +136,7 @@ open class ProgressWebViewController: UIViewController {
         self.rightNavigaionBarItemTypes = progressWebViewController.rightNavigaionBarItemTypes
         self.toolbarItemTypes = progressWebViewController.toolbarItemTypes
         self.delegate = progressWebViewController.delegate
+        self.isScrollEnabled = progressWebViewController.isScrollEnabled
     }
     
     deinit {
@@ -156,6 +163,7 @@ open class ProgressWebViewController: UIViewController {
         
         view = webView
         self.webView = webView
+        webView.scrollView.isScrollEnabled = isScrollEnabled
     }
     
     override open func viewDidLoad() {
@@ -280,6 +288,10 @@ public extension ProgressWebViewController {
     }
     
     func scrollToTop(animated: Bool, refresh: Bool = false) {
+        guard isScrollEnabled else {
+            return
+        }
+        
         var offsetY: CGFloat = 0
         if let navigationController = navigationController {
             offsetY -= navigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
@@ -293,6 +305,9 @@ public extension ProgressWebViewController {
     }
     
     func isScrollToTop() -> Bool {
+        guard isScrollEnabled else {
+            return true
+        }
         guard let scrollView = webView?.scrollView else {
             return false
         }
