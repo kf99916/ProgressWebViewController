@@ -40,10 +40,13 @@ open class ProgressWebViewController: UIViewController {
         "_blank": true
         ] as [String : Any]
     
-    open var cookies: [HTTPCookie]? {
+    @available(iOS, obsoleted: 1.12.0, renamed: "defaultCookies")
+    open var cookies: [HTTPCookie]?
+    
+    open var defaultCookies: [HTTPCookie]? {
         didSet {
-            var shouldReload = (cookies != nil && oldValue == nil) || (cookies == nil && oldValue != nil)
-            if let cookies = cookies, let oldValue = oldValue, cookies != oldValue {
+            var shouldReload = (defaultCookies != nil && oldValue == nil) || (defaultCookies == nil && oldValue != nil)
+            if let defaultCookies = defaultCookies, let oldValue = oldValue, defaultCookies != oldValue {
                 shouldReload = true
             }
             if shouldReload, let url = url {
@@ -51,10 +54,14 @@ open class ProgressWebViewController: UIViewController {
             }
         }
     }
-    open var headers: [String: String]? {
+    
+    @available(iOS, obsoleted: 1.12.0, renamed: "defaultHeaders")
+    open var headers: [String: String]?
+    
+    open var defaultHeaders: [String: String]? {
         didSet {
-            var shouldReload = (headers != nil && oldValue == nil) || (headers == nil && oldValue != nil)
-            if let headers = headers, let oldValue = oldValue, headers != oldValue {
+            var shouldReload = (defaultHeaders != nil && oldValue == nil) || (defaultHeaders == nil && oldValue != nil)
+            if let defaultHeaders = defaultHeaders, let oldValue = oldValue, defaultHeaders != oldValue {
                 shouldReload = true
             }
             if shouldReload, let url = url {
@@ -127,8 +134,8 @@ open class ProgressWebViewController: UIViewController {
         self.navigationWay = progressWebViewController.navigationWay
         self.pullToRefresh = progressWebViewController.pullToRefresh
         self.urlsHandledByApp = progressWebViewController.urlsHandledByApp
-        self.cookies = progressWebViewController.cookies
-        self.headers = progressWebViewController.headers
+        self.defaultCookies = progressWebViewController.defaultCookies
+        self.defaultHeaders = progressWebViewController.defaultHeaders
         self.tintColor = progressWebViewController.tintColor
         self.websiteTitleInNavigationBar = progressWebViewController.websiteTitleInNavigationBar
         self.doneBarButtonItemPosition = progressWebViewController.doneBarButtonItemPosition
@@ -346,7 +353,7 @@ public extension ProgressWebViewController {
 // MARK: - Fileprivate Methods
 fileprivate extension ProgressWebViewController {
     var availableCookies: [HTTPCookie]? {
-        return cookies?.filter {
+        return defaultCookies?.filter {
             cookie in
             var result = true
             if let host = url?.host, !cookie.domain.hasSuffix(host) {
@@ -363,9 +370,9 @@ fileprivate extension ProgressWebViewController {
     func createRequest(url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         
-        // Set up headers
-        if let headers = headers {
-            for (field, value) in headers {
+        // Set up Headers
+        if let defaultHeaders = defaultHeaders {
+            for (field, value) in defaultHeaders {
                 request.addValue(value, forHTTPHeaderField: field)
             }
         }

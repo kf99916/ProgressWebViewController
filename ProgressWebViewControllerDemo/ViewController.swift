@@ -52,9 +52,9 @@ class ViewController: UIViewController {
             progressWebViewController.navigationWay = .push
             progressWebViewController.toolbarItemTypes = [.reload, .activity]
             progressWebViewController.url = url
-            progressWebViewController.headers = ["browser": "in-app browser"]
+            progressWebViewController.defaultHeaders = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
-            progressWebViewController.cookies = [
+            progressWebViewController.defaultCookies = [
                 HTTPCookie(properties:
                 [HTTPCookiePropertyKey.originURL: url.absoluteString,
                  HTTPCookiePropertyKey.path: "/",
