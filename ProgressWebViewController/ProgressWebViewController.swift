@@ -103,9 +103,13 @@ open class ProgressWebViewController: UIViewController {
     
     lazy fileprivate var activityIndicatorView: UIActivityIndicatorView = {
         if #available(iOS 13.0, *) {
-            return UIActivityIndicatorView(style: .medium)
+            let activityIndicatorView = UIActivityIndicatorView(style: .medium)
+            activityIndicatorView.color = .label
+            return activityIndicatorView
         } else {
-            return UIActivityIndicatorView(style: .gray)
+            let activityIndicatorView = UIActivityIndicatorView(style: .gray)
+            activityIndicatorView.color = .blue
+            return activityIndicatorView
         }
     }()
     
