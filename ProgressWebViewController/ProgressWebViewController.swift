@@ -348,6 +348,16 @@ public extension ProgressWebViewController {
         }
         viewControllerToPresent.popoverPresentationController?.sourceRect = CGRect(origin: lastTapPosition, size: CGSize(width: 0, height: 0))
     }
+    
+    func reload() {
+        webView?.stopLoading()
+        if let url = webView?.url, !isBlank(url:url) {
+            webView?.reload()
+        }
+        else if let url = url {
+            load(url)
+        }
+    }
 }
 
 // MARK: - Fileprivate Methods
@@ -765,13 +775,7 @@ extension ProgressWebViewController: UIGestureRecognizerDelegate {
     }
     
     func reloadDidClick(sender: AnyObject) {
-        webView?.stopLoading()
-        if let url = webView?.url, !isBlank(url:url) {
-            webView?.reload()
-        }
-        else if let url = url {
-            load(url)
-        }
+        reload()
     }
     
     func stopDidClick(sender: AnyObject) {
