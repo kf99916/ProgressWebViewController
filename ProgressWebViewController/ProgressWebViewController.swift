@@ -503,7 +503,17 @@ fileprivate extension ProgressWebViewController {
     }
     
     func setUpState() {
-        navigationController?.setNavigationBarHidden(false, animated: true)
+        var numNavigationItems = 0
+        if let leftBarButtonItems = navigationItem.leftBarButtonItems {
+            numNavigationItems += leftBarButtonItems.count
+        }
+        if let rightBarButtonItems = navigationItem.rightBarButtonItems {
+            numNavigationItems += rightBarButtonItems.count
+        }
+        if navigationController?.viewControllers.count ?? 1 > 1 {
+            numNavigationItems += 1
+        }
+        navigationController?.setNavigationBarHidden(numNavigationItems <= 0, animated: true)
         navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
@@ -587,6 +597,7 @@ fileprivate extension ProgressWebViewController {
         let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
         progressWebViewController.url = url
         navigationController?.pushViewController(progressWebViewController, animated: true)
+        setUpState()
     }
 }
 

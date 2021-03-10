@@ -40,8 +40,8 @@ class ViewController: UIViewController {
             progressWebViewController.userAgent = "ProgressWebViewController/1.0.0"
             progressWebViewController.websiteTitleInNavigationBar = false
             progressWebViewController.navigationItem.title = "Google Website"
-            progressWebViewController.leftNavigaionBarItemTypes = [.reload]
-            progressWebViewController.toolbarItemTypes = [.back, .forward, .activity]
+            progressWebViewController.navigationWay = .push
+            progressWebViewController.toolbarItemTypes = [.reload, .activity]
         case "Show":
             guard let progressWebViewController = segue.destination as? ProgressWebViewController else {
                 return
@@ -49,8 +49,7 @@ class ViewController: UIViewController {
             
             progressWebViewController.isScrollEnabled = false
             progressWebViewController.disableZoom = true
-            progressWebViewController.navigationWay = .push
-            progressWebViewController.toolbarItemTypes = [.reload, .activity]
+            progressWebViewController.toolbarItemTypes = [.back, .forward, .reload, .activity]
             progressWebViewController.url = url
             progressWebViewController.defaultHeaders = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
