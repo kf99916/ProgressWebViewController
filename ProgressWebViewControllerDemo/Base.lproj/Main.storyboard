@@ -32,34 +32,39 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYm-fh-PVO">
-                                <rect key="frame" x="63.5" y="274" width="248" height="60"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="p2h-3E-ho1"/>
-                                </constraints>
-                                <state key="normal" title="Present ProgressWebViewController"/>
-                                <connections>
-                                    <segue destination="v9A-Ax-fet" kind="presentation" identifier="Present" modalPresentationStyle="fullScreen" id="mGu-LI-Pl7"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fEX-Hn-gk7">
-                                <rect key="frame" x="71" y="365" width="233" height="60"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="WEK-Ne-QrW"/>
-                                </constraints>
-                                <state key="normal" title="Show ProgressWebViewController"/>
-                                <connections>
-                                    <segue destination="ph4-LL-pip" kind="show" identifier="Show" id="bhK-Rk-E7V"/>
-                                </connections>
-                            </button>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="hlu-nB-azZ">
+                                <rect key="frame" x="0.0" y="306.5" width="375" height="150"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fEX-Hn-gk7">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="WEK-Ne-QrW"/>
+                                        </constraints>
+                                        <state key="normal" title="Show ProgressWebViewController"/>
+                                        <connections>
+                                            <segue destination="ph4-LL-pip" kind="show" identifier="Show" id="bhK-Rk-E7V"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pYm-fh-PVO">
+                                        <rect key="frame" x="0.0" y="90" width="375" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="60" id="p2h-3E-ho1"/>
+                                        </constraints>
+                                        <state key="normal" title="Present ProgressWebViewController"/>
+                                        <connections>
+                                            <segue destination="v9A-Ax-fet" kind="presentation" identifier="Present" modalPresentationStyle="fullScreen" id="mGu-LI-Pl7"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="hd6-vV-5bu"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="pYm-fh-PVO" firstAttribute="top" secondItem="hd6-vV-5bu" secondAttribute="top" constant="178" id="5Ux-BO-lOo"/>
-                            <constraint firstItem="fEX-Hn-gk7" firstAttribute="centerX" secondItem="rxc-Ss-KUL" secondAttribute="centerX" id="MbH-nF-7aA"/>
-                            <constraint firstItem="hd6-vV-5bu" firstAttribute="bottom" secondItem="fEX-Hn-gk7" secondAttribute="bottom" constant="242" id="Zjd-mO-ELE"/>
-                            <constraint firstItem="pYm-fh-PVO" firstAttribute="centerX" secondItem="rxc-Ss-KUL" secondAttribute="centerX" id="ipk-HG-l0d"/>
+                            <constraint firstItem="hlu-nB-azZ" firstAttribute="trailing" secondItem="hd6-vV-5bu" secondAttribute="trailing" id="ESe-q7-386"/>
+                            <constraint firstItem="hlu-nB-azZ" firstAttribute="leading" secondItem="hd6-vV-5bu" secondAttribute="leading" id="QAU-6R-htD"/>
+                            <constraint firstItem="hlu-nB-azZ" firstAttribute="centerY" secondItem="hd6-vV-5bu" secondAttribute="centerY" id="XKG-Ye-spl"/>
+                            <constraint firstItem="hlu-nB-azZ" firstAttribute="centerX" secondItem="hd6-vV-5bu" secondAttribute="centerX" id="gje-jD-71R"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="Vnl-L2-N49">

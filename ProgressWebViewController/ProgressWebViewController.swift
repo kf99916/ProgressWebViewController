@@ -87,14 +87,35 @@ open class ProgressWebViewController: UIViewController {
     open var toolbarItemTypes: [BarButtonItemType] = [.back, .forward, .reload, .activity]
     
     fileprivate var webView: WKWebView?
-    fileprivate var progressView: UIProgressView?
-    fileprivate var refreshControl: UIRefreshControl?
     
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
     
     fileprivate var scrollToRefresh = false
     fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
+    
+    lazy fileprivate var progressView: UIProgressView = {
+        let progressView = UIProgressView(progressViewStyle: .default)
+        progressView.alpha = 1
+        progressView.trackTintColor = UIColor(white: 1, alpha: 0)
+        return progressView
+    }()
+    
+    lazy fileprivate var activityIndicatorView: UIActivityIndicatorView = {
+        if #available(iOS 13.0, *) {
+            return UIActivityIndicatorView(style: .medium)
+        } else {
+            return UIActivityIndicatorView(style: .gray)
+        }
+    }()
+    
+    lazy fileprivate var refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshWebView(sender:)), for: UIControl.Event.valueChanged)
+        webView?.scrollView.addSubview(refreshControl)
+        webView?.scrollView.bounces = true
+        return refreshControl
+    }()
 
     lazy fileprivate var backBarButtonItem: UIBarButtonItem = {
         let bundle = Bundle(for: ProgressWebViewController.self)
@@ -186,12 +207,9 @@ open class ProgressWebViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(webViewDidTap(sender:)))
         tapGesture.delegate = self
         webView?.addGestureRecognizer(tapGesture)
-        
-        setUpProgressView()
+
+        updateProgressViewFrame()
         addBarButtonItems()
-        if pullToRefresh {
-            setUpRefreshControl()
-        }
         
         if let userAgent = userAgent {
             webView?.evaluateJavaScript("navigator.userAgent") { [weak self] result, error in
@@ -241,16 +259,26 @@ open class ProgressWebViewController: UIViewController {
             guard let estimatedProgress = webView?.estimatedProgress else {
                 return
             }
-            progressView?.alpha = 1
-            progressView?.setProgress(Float(estimatedProgress), animated: true)
             
-            if estimatedProgress >= 1.0 {
-                UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
-                    self.progressView?.alpha = 0
-                }, completion: {
-                    finished in
-                    self.progressView?.setProgress(0, animated: false)
-                })
+            if navigationController?.isNavigationBarHidden ?? false, activityIndicatorView.isDescendant(of: view) {
+                if estimatedProgress >= 1.0 {
+                    activityIndicatorView.stopAnimating()
+                } else {
+                    activityIndicatorView.startAnimating()
+                }
+            }
+            else if let navigationItem = navigationController?.navigationBar, progressView.isDescendant(of: navigationItem) {
+                progressView.alpha = 1
+                progressView.setProgress(Float(estimatedProgress), animated: true)
+                
+                if estimatedProgress >= 1.0 {
+                    UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
+                        self.progressView.alpha = 0
+                    }, completion: {
+                        finished in
+                        self.progressView.setProgress(0, animated: false)
+                    })
+                }
             }
         case titleKeyPath?:
             if websiteTitleInNavigationBar || URL(string: navigationItem.title ?? "")?.appendingPathComponent("") == url?.appendingPathComponent("") {
@@ -302,7 +330,7 @@ public extension ProgressWebViewController {
         if let navigationController = navigationController {
             offsetY -= navigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
         }
-        if refresh, let refreshControl = refreshControl {
+        if refresh, pullToRefresh {
             offsetY -= refreshControl.frame.size.height
         }
 
@@ -401,30 +429,11 @@ fileprivate extension ProgressWebViewController {
         return request
     }
     
-    func setUpProgressView() {
-        let progressView = UIProgressView(progressViewStyle: .default)
-        progressView.trackTintColor = UIColor(white: 1, alpha: 0)
-        self.progressView = progressView
-        updateProgressViewFrame()
-    }
-    
-    func setUpRefreshControl() {
-        guard refreshControl == nil else {
-            return
-        }
-        
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(refreshWebView(sender:)), for: UIControl.Event.valueChanged)
-        webView?.scrollView.addSubview(refreshControl)
-        webView?.scrollView.bounces = true
-        self.refreshControl = refreshControl
-    }
-    
     func updateProgressViewFrame() {
-        guard let navigationController = navigationController, let progressView = progressView else {
+        guard let navigationBar = navigationController?.navigationBar, progressView.isDescendant(of: navigationBar) else {
             return
         }
-        progressView.frame = CGRect(x: 0, y: navigationController.navigationBar.frame.size.height - progressView.frame.size.height, width: navigationController.navigationBar.frame.size.width, height: progressView.frame.size.height)
+        progressView.frame = CGRect(x: 0, y: navigationBar.frame.size.height - progressView.frame.size.height, width: navigationBar.frame.size.width, height: progressView.frame.size.height)
     }
     
     func addBarButtonItems() {
@@ -533,18 +542,23 @@ fileprivate extension ProgressWebViewController {
         navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
-            progressView?.progressTintColor = tintColor
+            progressView.progressTintColor = tintColor
             navigationController?.navigationBar.tintColor = tintColor
             navigationController?.toolbar.tintColor = tintColor
         }
-    
-        if let progressView = progressView {
-            navigationController?.navigationBar.addSubview(progressView)
+        
+        if navigationController?.isNavigationBarHidden ?? false, !activityIndicatorView.isDescendant(of: view) {
+            activityIndicatorView.center = view.center
+            view.addSubview(activityIndicatorView)
+            activityIndicatorView.startAnimating()
+        }
+        else if let navigationBar = navigationController?.navigationBar, !progressView.isDescendant(of: navigationBar) {
+            navigationBar.addSubview(progressView)
         }
     }
     
     func rollbackState() {
-        progressView?.removeFromSuperview()
+        progressView.removeFromSuperview()
     
         navigationController?.navigationBar.tintColor = previousNavigationBarState.tintColor
         navigationController?.toolbar.tintColor = previousToolbarState.tintColor
@@ -630,7 +644,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         updateBarButtonItems()
         updateProgressViewFrame()
-        if let refreshControl = refreshControl {
+        if pullToRefresh {
             refreshControl.endRefreshing()
         }
         if let url = webView.url {
@@ -644,7 +658,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
         updateProgressViewFrame()
-        if let refreshControl = refreshControl {
+        if pullToRefresh {
             refreshControl.endRefreshing()
         }
         if let url = url {
@@ -655,7 +669,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         updateBarButtonItems()
         updateProgressViewFrame()
-        if let refreshControl = refreshControl {
+        if pullToRefresh {
             refreshControl.endRefreshing()
         }
         if let url = url {
@@ -746,7 +760,7 @@ extension ProgressWebViewController: UIScrollViewDelegate {
     }
     
     public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-        if scrollToRefresh, let refreshControl = refreshControl {
+        if scrollToRefresh, pullToRefresh {
             refreshWebView(sender: refreshControl)
         }
         scrollToRefresh = false
