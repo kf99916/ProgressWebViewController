@@ -143,7 +143,6 @@ open class ProgressWebViewController: UIViewController {
         self.rightNavigaionBarItemTypes = progressWebViewController.rightNavigaionBarItemTypes
         self.toolbarItemTypes = progressWebViewController.toolbarItemTypes
         self.delegate = progressWebViewController.delegate
-        self.isScrollEnabled = progressWebViewController.isScrollEnabled
     }
     
     deinit {
