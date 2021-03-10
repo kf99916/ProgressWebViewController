@@ -358,6 +358,13 @@ public extension ProgressWebViewController {
             load(url)
         }
     }
+    
+    func pushWebViewController(url: URL) {
+        let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
+        progressWebViewController.url = url
+        navigationController?.pushViewController(progressWebViewController, animated: true)
+        setUpState()
+    }
 }
 
 // MARK: - Fileprivate Methods
@@ -601,13 +608,6 @@ fileprivate extension ProgressWebViewController {
     
     func isBlank(url: URL) -> Bool {
         return url.absoluteString == "about:blank"
-    }
-    
-    func pushWebViewController(url: URL) {
-        let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
-        progressWebViewController.url = url
-        navigationController?.pushViewController(progressWebViewController, animated: true)
-        setUpState()
     }
 }
 
