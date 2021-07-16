@@ -545,8 +545,6 @@ fileprivate extension ProgressWebViewController {
         if navigationController?.viewControllers.count ?? 1 > 1 {
             numNavigationItems += 1
         }
-        navigationController?.setNavigationBarHidden(numNavigationItems <= 0, animated: true)
-        navigationController?.setToolbarHidden(toolbarItemTypes.count == 0, animated: true)
     
         if let tintColor = tintColor {
             progressView.progressTintColor = tintColor
