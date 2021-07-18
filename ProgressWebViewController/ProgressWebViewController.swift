@@ -206,9 +206,9 @@ open class ProgressWebViewController: UIViewController {
         // Do any additional setup after loading the view.
         navigationItem.title = navigationItem.title ?? url?.absoluteString
         
-        if let navigationController = navigationController {
-            previousNavigationBarState = (navigationController.navigationBar.tintColor, navigationController.navigationBar.isHidden)
-            previousToolbarState = (navigationController.toolbar.tintColor, navigationController.toolbar.isHidden)
+        if let currentNavigationController = currentNavigationController {
+            previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.navigationBar.isHidden)
+            previousToolbarState = (currentNavigationController.toolbar.tintColor, currentNavigationController.toolbar.isHidden)
         }
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(webViewDidTap(sender:)))
@@ -267,14 +267,14 @@ open class ProgressWebViewController: UIViewController {
                 return
             }
             
-            if navigationController?.isNavigationBarHidden ?? false, activityIndicatorView.isDescendant(of: view) {
+            if currentNavigationController?.isNavigationBarHidden ?? true, activityIndicatorView.isDescendant(of: view) {
                 if estimatedProgress >= 1.0 {
                     activityIndicatorView.stopAnimating()
                 } else {
                     activityIndicatorView.startAnimating()
                 }
             }
-            else if let navigationItem = navigationController?.navigationBar, progressView.isDescendant(of: navigationItem) {
+            else if let navigationItem = currentNavigationController?.navigationBar, progressView.isDescendant(of: navigationItem) {
                 progressView.alpha = 1
                 progressView.setProgress(Float(estimatedProgress), animated: true)
                 
@@ -301,6 +301,10 @@ open class ProgressWebViewController: UIViewController {
     override open func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
       setUIDocumentMenuViewControllerSoureViewsIfNeeded(viewControllerToPresent)
       super.present(viewControllerToPresent, animated: flag, completion: completion)
+    }
+    
+    override open func targetViewController(forAction action: Selector, sender: Any?) -> UIViewController? {
+        return currentNavigationController
     }
 }
 
@@ -334,8 +338,8 @@ public extension ProgressWebViewController {
         }
         
         var offsetY: CGFloat = 0
-        if let navigationController = navigationController {
-            offsetY -= navigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
+        if let currentNavigationController = currentNavigationController {
+            offsetY -= currentNavigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
         }
         if refresh, pullToRefresh {
             offsetY -= refreshControl.frame.size.height
@@ -396,7 +400,7 @@ public extension ProgressWebViewController {
     func pushWebViewController(url: URL) {
         let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
         progressWebViewController.url = url
-        navigationController?.pushViewController(progressWebViewController, animated: true)
+        show(progressWebViewController, sender: self)
         setUpState()
     }
 }
@@ -418,6 +422,10 @@ fileprivate extension ProgressWebViewController {
         }
     }
     
+    var currentNavigationController: UINavigationController? {
+        return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController
+    }
+    
     func createRequest(url: URL) -> URLRequest {
         var request = URLRequest(url: url)
         
@@ -437,7 +445,7 @@ fileprivate extension ProgressWebViewController {
     }
     
     func updateProgressViewFrame() {
-        guard let navigationBar = navigationController?.navigationBar, progressView.isDescendant(of: navigationBar) else {
+        guard let navigationBar = currentNavigationController?.navigationBar, progressView.isDescendant(of: navigationBar) else {
             return
         }
         progressView.frame = CGRect(x: 0, y: navigationBar.frame.size.height - progressView.frame.size.height, width: navigationBar.frame.size.width, height: progressView.frame.size.height)
@@ -542,22 +550,22 @@ fileprivate extension ProgressWebViewController {
         if let rightBarButtonItems = navigationItem.rightBarButtonItems {
             numNavigationItems += rightBarButtonItems.count
         }
-        if navigationController?.viewControllers.count ?? 1 > 1 {
+        if currentNavigationController?.viewControllers.count ?? 1 > 1 {
             numNavigationItems += 1
         }
     
         if let tintColor = tintColor {
             progressView.progressTintColor = tintColor
-            navigationController?.navigationBar.tintColor = tintColor
-            navigationController?.toolbar.tintColor = tintColor
+            currentNavigationController?.navigationBar.tintColor = tintColor
+            currentNavigationController?.toolbar.tintColor = tintColor
         }
         
-        if navigationController?.isNavigationBarHidden ?? false, !activityIndicatorView.isDescendant(of: view) {
+        if currentNavigationController?.isNavigationBarHidden ?? true, !activityIndicatorView.isDescendant(of: view) {
             activityIndicatorView.center = view.center
             view.addSubview(activityIndicatorView)
             activityIndicatorView.startAnimating()
         }
-        else if let navigationBar = navigationController?.navigationBar, !progressView.isDescendant(of: navigationBar) {
+        else if let navigationBar = currentNavigationController?.navigationBar, !progressView.isDescendant(of: navigationBar) {
             navigationBar.addSubview(progressView)
         }
     }
@@ -565,11 +573,15 @@ fileprivate extension ProgressWebViewController {
     func rollbackState() {
         progressView.removeFromSuperview()
     
-        navigationController?.navigationBar.tintColor = previousNavigationBarState.tintColor
-        navigationController?.toolbar.tintColor = previousToolbarState.tintColor
+        if let tintColor = previousNavigationBarState.tintColor {
+            currentNavigationController?.navigationBar.tintColor = tintColor
+        }
+        if let tintColor = previousToolbarState.tintColor {
+            currentNavigationController?.toolbar.tintColor = tintColor
+        }
         
-        navigationController?.setToolbarHidden(previousToolbarState.hidden, animated: true)
-        navigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
+        currentNavigationController?.setToolbarHidden(previousToolbarState.hidden, animated: true)
+        currentNavigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
     func checkRequestCookies(_ request: URLRequest, cookies: [HTTPCookie]) -> Bool {
@@ -753,8 +765,8 @@ extension ProgressWebViewController: WKNavigationDelegate {
             responsePolicy = result ? .allow : .cancel
         }
         
-        if navigationWay == .push, responsePolicy == .cancel, let webViewController = navigationController?.topViewController as? ProgressWebViewController, webViewController.url?.appendingPathComponent("") == url.appendingPathComponent("") {
-            navigationController?.popViewController(animated: true)
+        if navigationWay == .push, responsePolicy == .cancel, let webViewController = currentNavigationController?.topViewController as? ProgressWebViewController, webViewController.url?.appendingPathComponent("") == url.appendingPathComponent("") {
+            currentNavigationController?.popViewController(animated: true)
         }
     }
 }
