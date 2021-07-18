@@ -93,6 +93,31 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var scrollToRefresh = false
     fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
+    fileprivate var isReloadWhenAppear = false
+    fileprivate var estimatedProgress = 0.0 {
+        didSet {
+            if currentNavigationController?.isNavigationBarHidden ?? true, activityIndicatorView.isDescendant(of: view) {
+                if estimatedProgress >= 1.0 {
+                    activityIndicatorView.stopAnimating()
+                } else {
+                    activityIndicatorView.startAnimating()
+                }
+            }
+            else if let navigationItem = currentNavigationController?.navigationBar, progressView.isDescendant(of: navigationItem) {
+                progressView.alpha = 1
+                progressView.setProgress(Float(estimatedProgress), animated: true)
+                
+                if estimatedProgress >= 1.0 {
+                    UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
+                        self.progressView.alpha = 0
+                    }, completion: {
+                        finished in
+                        self.progressView.setProgress(0, animated: false)
+                    })
+                }
+            }
+        }
+    }
     
     lazy fileprivate var progressView: UIProgressView = {
         let progressView = UIProgressView(progressViewStyle: .default)
@@ -247,11 +272,18 @@ open class ProgressWebViewController: UIViewController {
         super.viewWillAppear(animated)
         
         setUpState()
+        if isReloadWhenAppear {
+            reload()
+        }
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+        if estimatedProgress < 1 {
+            isReloadWhenAppear = true
+            webView?.stopLoading()
+        }
         rollbackState()
     }
 
@@ -266,27 +298,7 @@ open class ProgressWebViewController: UIViewController {
             guard let estimatedProgress = webView?.estimatedProgress else {
                 return
             }
-            
-            if currentNavigationController?.isNavigationBarHidden ?? true, activityIndicatorView.isDescendant(of: view) {
-                if estimatedProgress >= 1.0 {
-                    activityIndicatorView.stopAnimating()
-                } else {
-                    activityIndicatorView.startAnimating()
-                }
-            }
-            else if let navigationItem = currentNavigationController?.navigationBar, progressView.isDescendant(of: navigationItem) {
-                progressView.alpha = 1
-                progressView.setProgress(Float(estimatedProgress), animated: true)
-                
-                if estimatedProgress >= 1.0 {
-                    UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
-                        self.progressView.alpha = 0
-                    }, completion: {
-                        finished in
-                        self.progressView.setProgress(0, animated: false)
-                    })
-                }
-            }
+            self.estimatedProgress = estimatedProgress
         case titleKeyPath?:
             if websiteTitleInNavigationBar || URL(string: navigationItem.title ?? "")?.appendingPathComponent("") == url?.appendingPathComponent("") {
                 navigationItem.title = webView?.title
@@ -389,6 +401,7 @@ public extension ProgressWebViewController {
     
     func reload() {
         webView?.stopLoading()
+        isReloadWhenAppear = false
         if let url = webView?.url, !isBlank(url:url) {
             webView?.reload()
         }
@@ -771,7 +784,12 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
-        webView.reload()
+        if viewIfLoaded?.window != nil {
+            reload()
+        }
+        else {
+            isReloadWhenAppear = true
+        }
     }
 }
 
