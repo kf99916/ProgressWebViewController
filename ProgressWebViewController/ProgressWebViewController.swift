@@ -769,6 +769,10 @@ extension ProgressWebViewController: WKNavigationDelegate {
             currentNavigationController?.popViewController(animated: true)
         }
     }
+    
+    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        webView.reload()
+    }
 }
 
 extension ProgressWebViewController: UIScrollViewDelegate {
