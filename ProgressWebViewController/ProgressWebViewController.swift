@@ -88,8 +88,8 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView?
     
-    fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
-    fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool) = (.black, false)
+    fileprivate var previousNavigationBarState: (tintColor: UIColor?, hidden: Bool) = (nil, false)
+    fileprivate var previousToolbarState: (tintColor: UIColor?, hidden: Bool) = (nil, true)
     
     fileprivate var scrollToRefresh = false
     fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
