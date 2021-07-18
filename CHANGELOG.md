@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 2.0.0
+
+- Support container view
+- Show activity indicator if no navigation bar
+- Support dark mode
+- Correct navigation way
+
 ## Version 1.11.0
 
 - Support video "playinline"
