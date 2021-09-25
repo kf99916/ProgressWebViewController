@@ -665,9 +665,6 @@ extension ProgressWebViewController: WKNavigationDelegate {
         updateBarButtonItems()
         updateProgressViewFrame()
         if let url = webView.url {
-            if !isBlank(url:url) {
-                self.url = url
-            }
             delegate?.progressWebViewController?(self, didStart: url)
         }
     }
