@@ -205,24 +205,10 @@ open class ProgressWebViewController: UIViewController {
     override open func loadView() {
         let webConfiguration = WKWebViewConfiguration()
         webConfiguration.allowsInlineMediaPlayback = true
-        let webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        if #available(iOS 13.0, *) {
-            webView.backgroundColor = .systemBackground
-        }
-        
-        webView.uiDelegate = self
-        webView.navigationDelegate = self
-        webView.scrollView.delegate = self
-        
-        webView.allowsBackForwardNavigationGestures = true
-        webView.isMultipleTouchEnabled = true
-        
-        webView.addObserver(self, forKeyPath: estimatedProgressKeyPath, options: .new, context: nil)
-        webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
-        
+        let webView = createWebView(webConfiguration: webConfiguration)
+
         view = webView
         self.webView = webView
-        webView.scrollView.isScrollEnabled = isScrollEnabled
     }
     
     override open func viewDidLoad() {
@@ -437,6 +423,26 @@ fileprivate extension ProgressWebViewController {
     
     var currentNavigationController: UINavigationController? {
         return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController
+    }
+    
+    func createWebView(webConfiguration: WKWebViewConfiguration) -> WKWebView {
+        let webView = WKWebView(frame: .zero, configuration: webConfiguration)
+        if #available(iOS 13.0, *) {
+            webView.backgroundColor = .systemBackground
+        }
+        
+        webView.uiDelegate = self
+        webView.navigationDelegate = self
+        webView.scrollView.delegate = self
+        
+        webView.allowsBackForwardNavigationGestures = true
+        webView.isMultipleTouchEnabled = true
+        
+        webView.addObserver(self, forKeyPath: estimatedProgressKeyPath, options: .new, context: nil)
+        webView.addObserver(self, forKeyPath: titleKeyPath, options: .new, context: nil)
+        
+        webView.scrollView.isScrollEnabled = isScrollEnabled
+        return webView
     }
     
     func createRequest(url: URL) -> URLRequest {
@@ -656,7 +662,12 @@ fileprivate extension ProgressWebViewController {
 
 // MARK: - WKUIDelegate
 extension ProgressWebViewController: WKUIDelegate {
-    
+    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if !(navigationAction.targetFrame?.isMainFrame ?? false) {
+            webView.load(navigationAction.request)
+        }
+        return nil
+    }
 }
 
 // MARK: - WKNavigationDelegate
