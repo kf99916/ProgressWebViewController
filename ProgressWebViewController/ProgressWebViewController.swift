@@ -20,6 +20,7 @@ let cookieKey = "Cookie"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, didFail url: URL, withError error: Error)
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView?
     @objc optional func initPushedProgressWebViewController(url: URL) -> ProgressWebViewController
 }
 
@@ -663,7 +664,10 @@ fileprivate extension ProgressWebViewController {
 // MARK: - WKUIDelegate
 extension ProgressWebViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        if !(navigationAction.targetFrame?.isMainFrame ?? false) {
+        if let createWebViewWithConfiguartion = delegate?.progressWebViewController(_:createWebViewWith:for:windowFeatures:) {
+            return createWebViewWithConfiguartion(self, configuration, navigationAction, windowFeatures)
+        }
+        else if !(navigationAction.targetFrame?.isMainFrame ?? false) {
             webView.load(navigationAction.request)
         }
         return nil
