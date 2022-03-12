@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 3.0.0
+
+- Improve performance
+- Rename `url` as `defaultURL` and expose `currentURL` (Breaking Change)
+- Support window.open()
+- Add delegate to handle createWebViewWith()
+- Reload webview once the webview process is terminated
+
 ## Version 2.0.0
 
 - Support container view
