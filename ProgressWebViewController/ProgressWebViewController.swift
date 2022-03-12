@@ -318,6 +318,7 @@ open class ProgressWebViewController: UIViewController {
 // MARK: - Public Methods
 public extension ProgressWebViewController {
     func load(_ url: URL) {
+        isReloadWhenAppear = false
         if isViewLoaded {
             let request = createRequest(url: url)
             DispatchQueue.main.async {
@@ -331,6 +332,7 @@ public extension ProgressWebViewController {
     }
     
     func load(htmlString: String, baseURL: URL?) {
+        isReloadWhenAppear = false
         DispatchQueue.main.async {
             self.webView?.stopLoading()
             self.webView?.loadHTMLString(htmlString, baseURL: baseURL)
