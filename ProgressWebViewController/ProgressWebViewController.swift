@@ -21,7 +21,7 @@ let cookieKey = "Cookie"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView?
-    @objc optional func initPushedProgressWebViewController(url: URL) -> ProgressWebViewController
+    @objc optional func initPushedProgressWebViewController(defaultURL: URL) -> ProgressWebViewController
 }
 
 @objc public protocol ProgressWebViewControllerScrollViewDelegate {
@@ -29,7 +29,11 @@ let cookieKey = "Cookie"
 }
 
 open class ProgressWebViewController: UIViewController {
+    
+    @available(*, unavailable, renamed: "defaultURL")
     open var url: URL?
+    
+    open var defaultURL: URL?
     open var bypassedSSLHosts: [String]?
     open var userAgent: String?
     open var disableZoom = false
@@ -50,8 +54,8 @@ open class ProgressWebViewController: UIViewController {
             if let defaultCookies = defaultCookies, let oldValue = oldValue, defaultCookies != oldValue {
                 shouldReload = true
             }
-            if shouldReload, let url = url {
-                load(url)
+            if shouldReload {
+                reload()
             }
         }
     }
@@ -65,8 +69,8 @@ open class ProgressWebViewController: UIViewController {
             if let defaultHeaders = defaultHeaders, let oldValue = oldValue, defaultHeaders != oldValue {
                 shouldReload = true
             }
-            if shouldReload, let url = url {
-                load(url)
+            if shouldReload {
+                reload()
             }
         }
     }
@@ -75,6 +79,10 @@ open class ProgressWebViewController: UIViewController {
         didSet {
             webView?.scrollView.isScrollEnabled = isScrollEnabled
         }
+    }
+    
+    open var currentURL: URL? {
+        return webView?.url
     }
     
     open var delegate: ProgressWebViewControllerDelegate?
@@ -216,7 +224,7 @@ open class ProgressWebViewController: UIViewController {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
-        navigationItem.title = navigationItem.title ?? url?.absoluteString
+        navigationItem.title = navigationItem.title ?? defaultURL?.absoluteString
         
         if let currentNavigationController = currentNavigationController {
             previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.navigationBar.isHidden)
@@ -237,7 +245,7 @@ open class ProgressWebViewController: UIViewController {
                 }
                 
                 defer {
-                    if let url = weakSelf.url {
+                    if let url = weakSelf.defaultURL {
                         weakSelf.load(url)
                     }
                 }
@@ -250,7 +258,7 @@ open class ProgressWebViewController: UIViewController {
                 weakSelf.webView?.customUserAgent = String(format: "%@ %@", originalUserAgent, userAgent)
             }
         }
-        else if let url = url {
+        else if let url = defaultURL {
             load(url)
         }
     }
@@ -287,7 +295,7 @@ open class ProgressWebViewController: UIViewController {
             }
             self.estimatedProgress = estimatedProgress
         case titleKeyPath?:
-            if websiteTitleInNavigationBar || URL(string: navigationItem.title ?? "")?.appendingPathComponent("") == url?.appendingPathComponent("") {
+            if websiteTitleInNavigationBar || URL(string: navigationItem.title ?? "")?.appendingPathComponent("") == currentURL?.appendingPathComponent("") {
                 navigationItem.title = webView?.title
             }
         default:
@@ -310,17 +318,21 @@ open class ProgressWebViewController: UIViewController {
 // MARK: - Public Methods
 public extension ProgressWebViewController {
     func load(_ url: URL) {
-        guard let webView = webView else {
-            return
+        if isViewLoaded {
+            let request = createRequest(url: url)
+            DispatchQueue.main.async {
+                self.webView?.stopLoading()
+                self.webView?.load(request)
+            }
         }
-        let request = createRequest(url: url)
-        DispatchQueue.main.async {
-            webView.load(request)
+        else {
+            defaultURL = url
         }
     }
     
     func load(htmlString: String, baseURL: URL?) {
         DispatchQueue.main.async {
+            self.webView?.stopLoading()
             self.webView?.loadHTMLString(htmlString, baseURL: baseURL)
         }
     }
@@ -374,7 +386,6 @@ public extension ProgressWebViewController {
         guard let url = URL(string:"about:blank") else {
             return
         }
-        self.url = url
         load(url)
     }
     
@@ -389,20 +400,23 @@ public extension ProgressWebViewController {
     func reload() {
         webView?.stopLoading()
         isReloadWhenAppear = false
-        if let url = webView?.url, !isBlank(url:url) {
+        if let url = currentURL, !isBlank(url:url) {
             webView?.reload()
         }
-        else if let url = url {
+        else if let url = defaultURL {
             load(url)
         }
     }
     
-    func pushWebViewController(url: URL) {
-        let progressWebViewController = delegate?.initPushedProgressWebViewController?(url: url) ?? ProgressWebViewController(self)
-        progressWebViewController.url = url
+    func pushWebViewController(defaultURL: URL) {
+        let progressWebViewController = delegate?.initPushedProgressWebViewController?(defaultURL: defaultURL) ?? ProgressWebViewController(self)
+        progressWebViewController.defaultURL = defaultURL
         show(progressWebViewController, sender: self)
         setUpState()
     }
+    
+    @available(*, unavailable, renamed: "pushWebViewController(defaultURL:)")
+    func pushWebViewController(url: URL) {  }
 }
 
 // MARK: - Fileprivate Methods
@@ -411,10 +425,10 @@ fileprivate extension ProgressWebViewController {
         return defaultCookies?.filter {
             cookie in
             var result = true
-            if let host = url?.host, !cookie.domain.hasSuffix(host) {
+            if let host = currentURL?.host, !cookie.domain.hasSuffix(host) {
                 result = false
             }
-            if cookie.isSecure && url?.scheme != "https" {
+            if cookie.isSecure && currentURL?.scheme != "https" {
                 result = false
             }
             
@@ -679,7 +693,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         updateBarButtonItems()
         updateProgressViewFrame()
-        if let url = webView.url {
+        if let url = webView.url ?? defaultURL {
             delegate?.progressWebViewController?(self, didStart: url)
         }
     }
@@ -689,10 +703,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if pullToRefresh {
             refreshControl.endRefreshing()
         }
-        if let url = webView.url {
-            if !isBlank(url:url) {
-                self.url = url
-            }
+        if let url = webView.url ?? defaultURL {
             delegate?.progressWebViewController?(self, didFinish: url)
         }
     }
@@ -703,7 +714,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if pullToRefresh {
             refreshControl.endRefreshing()
         }
-        if let url = url {
+        if let url = webView.url ?? defaultURL {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
@@ -714,7 +725,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
         if pullToRefresh {
             refreshControl.endRefreshing()
         }
-        if let url = url {
+        if let url = webView.url ?? defaultURL {
             delegate?.progressWebViewController?(self, didFail: url, withError: error)
         }
     }
@@ -759,19 +770,19 @@ extension ProgressWebViewController: WKNavigationDelegate {
         case .linkActivated:
             if let fragment = url.fragment {
                 let removedFramgnetURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: ""))
-                if removedFramgnetURL == self.url {
+                if removedFramgnetURL == currentURL {
                     return
                 }
             }
             if navigationWay == .push {
-                pushWebViewController(url: url)
+                pushWebViewController(defaultURL: url)
                 actionPolicy = .cancel
                 return
             }
             fallthrough
         default:
             if navigationAction.targetFrame == nil {
-                pushWebViewController(url: url)
+                pushWebViewController(defaultURL: url)
                 actionPolicy = .cancel
             }
         }
@@ -790,7 +801,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
             responsePolicy = result ? .allow : .cancel
         }
         
-        if navigationWay == .push, responsePolicy == .cancel, let webViewController = currentNavigationController?.topViewController as? ProgressWebViewController, webViewController.url?.appendingPathComponent("") == url.appendingPathComponent("") {
+        if navigationWay == .push, responsePolicy == .cancel, let webViewController = currentNavigationController?.topViewController as? ProgressWebViewController, webViewController.currentURL?.appendingPathComponent("") == url.appendingPathComponent("") {
             currentNavigationController?.popViewController(animated: true)
         }
     }
@@ -847,7 +858,7 @@ extension ProgressWebViewController: UIGestureRecognizerDelegate {
     }
     
     func activityDidClick(sender: AnyObject) {
-        guard let url = url else {
+        guard let url = currentURL else {
             return
         }
         
@@ -857,7 +868,7 @@ extension ProgressWebViewController: UIGestureRecognizerDelegate {
     
     func doneDidClick(sender: AnyObject) {
         var canDismiss = true
-        if let url = url {
+        if let url = currentURL {
             canDismiss = delegate?.progressWebViewController?(self, canDismiss: url) ?? true
         }
         if canDismiss {
