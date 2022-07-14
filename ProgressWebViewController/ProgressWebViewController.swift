@@ -772,6 +772,10 @@ extension ProgressWebViewController: WKNavigationDelegate {
         case .linkActivated:
             if let fragment = url.fragment {
                 let removedFramgnetURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: ""))
+                var currentURL = currentURL
+                if let currentFragment = currentURL?.fragment {
+                    currentURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(currentFragment)", with: ""))
+                }
                 if removedFramgnetURL == currentURL {
                     return
                 }
