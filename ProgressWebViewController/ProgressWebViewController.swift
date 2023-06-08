@@ -311,7 +311,12 @@ open class ProgressWebViewController: UIViewController {
     }
     
     override open func targetViewController(forAction action: Selector, sender: Any?) -> UIViewController? {
-        return currentNavigationController
+        switch navigationWay {
+        case .browser:
+            return currentNavigationController
+        case .push(let targetViewController):
+            return targetViewController ?? currentNavigationController
+        }
     }
 }
 
@@ -780,7 +785,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
                     return
                 }
             }
-            if navigationWay == .push {
+            if case .push = navigationWay {
                 pushWebViewController(defaultURL: url)
                 actionPolicy = .cancel
                 return
@@ -807,7 +812,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
             responsePolicy = result ? .allow : .cancel
         }
         
-        if navigationWay == .push, responsePolicy == .cancel, let webViewController = currentNavigationController?.topViewController as? ProgressWebViewController, webViewController.currentURL?.appendingPathComponent("") == url.appendingPathComponent("") {
+        if case .push = navigationWay, responsePolicy == .cancel, let webViewController = currentNavigationController?.topViewController as? ProgressWebViewController, webViewController.currentURL?.appendingPathComponent("") == url.appendingPathComponent("") {
             currentNavigationController?.popViewController(animated: true)
         }
     }

@@ -26,7 +26,7 @@ public enum NavigationBarPosition {
 
 public enum NavigationWay {
     case browser
-    case push
+    case push(targetViewController: UIViewController?)
 }
 
 @objc public enum NavigationType: Int {
