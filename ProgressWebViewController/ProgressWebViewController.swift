@@ -31,7 +31,7 @@ let cookieKey = "Cookie"
 open class ProgressWebViewController: UIViewController {
     
     @available(*, unavailable, renamed: "defaultURL")
-    open var url: URL? { return nil }
+    open var url: URL? { return defaultURL }
     
     open var defaultURL: URL?
     open var bypassedSSLHosts: [String]?
@@ -46,7 +46,7 @@ open class ProgressWebViewController: UIViewController {
         ] as [String : Any]
     
     @available(iOS, obsoleted: 1.12.0, renamed: "defaultCookies")
-    open var cookies: [HTTPCookie]? { return nil }
+    open var cookies: [HTTPCookie]? { return defaultCookies }
     
     open var defaultCookies: [HTTPCookie]? {
         didSet {
@@ -61,7 +61,7 @@ open class ProgressWebViewController: UIViewController {
     }
     
     @available(iOS, obsoleted: 1.12.0, renamed: "defaultHeaders")
-    open var headers: [String: String]? { return nil }
+    open var headers: [String: String]? { return defaultHeaders }
     
     open var defaultHeaders: [String: String]? {
         didSet {
