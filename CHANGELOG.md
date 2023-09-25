@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 3.1.0
+
+- Support Xcode 15
+- Fix url fragment
+- Reset isReloadWhenAppear to correct load new url
+
+Breaking Changes
+
+- Add target view controller in the push navigation way
+
 ## Version 3.0.0
 
 - Improve performance

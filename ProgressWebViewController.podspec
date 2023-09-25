@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'ProgressWebViewController'
-  s.version          = '3.0.0'
+  s.version          = '3.1.0'
   s.summary          = 'A WebViewController implemented by WKWebView with a progress bar in the navigation bar'
 
 # This description is used to generate tags and improve search results.
@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/kf99916/ProgressWebViewController.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.0'
+  s.ios.deployment_target = '12.0'
 
   s.source_files = 'ProgressWebViewController/**/*.swift'
   s.resources = ['ProgressWebViewController/**/*.xcassets']
