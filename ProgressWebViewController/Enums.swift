@@ -6,7 +6,7 @@
 //  Copyright © 2017年 Zheng-Xiang Ke. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 public enum BarButtonItemType {
     case back
