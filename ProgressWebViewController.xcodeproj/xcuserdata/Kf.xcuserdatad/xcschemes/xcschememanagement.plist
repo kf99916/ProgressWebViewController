@@ -12,7 +12,7 @@
 		<key>ProgressWebViewController.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 		<key>ProgressWebViewControllerDemo.xcscheme</key>
 		<dict>
@@ -22,7 +22,15 @@
 		<key>ProgressWebViewControllerDemo.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>AA28A1BC1F91C86700B67E53</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
