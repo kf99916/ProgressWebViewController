@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Zheng-Xiang Ke' => 'kf99916@gmail.com' }
   s.source           = { :git => 'https://github.com/kf99916/ProgressWebViewController.git', :tag => s.version.to_s }
+  s.swift_versions   = '5.0'
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '12.0'
