@@ -352,6 +352,9 @@ public extension ProgressWebViewController {
     
     func scrollToTop(animated: Bool, refresh: Bool = false) {
         guard isScrollEnabled else {
+            if refresh {
+                refreshWebView(sender: refreshControl)
+            }
             return
         }
         
