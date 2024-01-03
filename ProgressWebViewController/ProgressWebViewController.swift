@@ -823,8 +823,6 @@ extension ProgressWebViewController: WKNavigationDelegate {
         }
         
         switch navigationAction.navigationType {
-        case .formSubmitted:
-            fallthrough
         case .linkActivated:
             if let fragment = url.fragment {
                 let removedFramgnetURL = URL(string: url.absoluteString.replacingOccurrences(of: "#\(fragment)", with: ""))
