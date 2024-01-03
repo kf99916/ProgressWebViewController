@@ -30,10 +30,10 @@ public enum NavigationWay {
 }
 
 @objc public enum NavigationType: Int {
-    case linkActivated
-    case formSubmitted
-    case backForward
-    case reload
-    case formResubmitted
-    case other
+    case linkActivated = 0
+    case formSubmitted = 1
+    case backForward = 2
+    case reload = 3
+    case formResubmitted = 4
+    case other = -1
 }
