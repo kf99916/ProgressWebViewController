@@ -839,12 +839,12 @@ extension ProgressWebViewController: WKNavigationDelegate {
                 actionPolicy = .cancel
                 return
             }
-            fallthrough
-        default:
             if navigationAction.targetFrame == nil {
                 pushWebViewController(defaultURL: url)
                 actionPolicy = .cancel
             }
+        default:
+            break
         }
     }
     
