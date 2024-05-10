@@ -218,6 +218,11 @@ open class ProgressWebViewController: UIViewController {
 
         view = webView
         self.webView = webView
+#if DEBUG
+        if #available(iOS 16.4, *) {
+            self.webView?.isInspectable = true
+        }
+#endif
     }
     
     override open func viewDidLoad() {
