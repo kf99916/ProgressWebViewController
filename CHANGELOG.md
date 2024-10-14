@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 3.2.0
+
+- Support JavaScript alert panel, confirm panel, and text input panel
+- Refresh webview event through scroll is disabled
+- Make web view inspectable for debug
+- Fix strong reference cycle
+
 ## Version 3.1.0
 
 - Support Xcode 15
