@@ -85,8 +85,8 @@ open class ProgressWebViewController: UIViewController {
         return webView?.url
     }
     
-    open var delegate: ProgressWebViewControllerDelegate?
-    open var scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate?
+    weak open var delegate: ProgressWebViewControllerDelegate?
+    weak open var scrollViewDelegate: ProgressWebViewControllerScrollViewDelegate?
     
     open var tintColor: UIColor?
     open var websiteTitleInNavigationBar = true
@@ -208,6 +208,8 @@ open class ProgressWebViewController: UIViewController {
         webView?.removeObserver(self, forKeyPath: estimatedProgressKeyPath)
         webView?.removeObserver(self, forKeyPath: titleKeyPath)
 
+        webView?.uiDelegate = nil
+        webView?.navigationDelegate = nil
         webView?.scrollView.delegate = nil
     }
     
@@ -562,12 +564,15 @@ fileprivate extension ProgressWebViewController {
         forwardBarButtonItem.isEnabled = webView?.canGoForward ?? false
         
         let updateReloadBarButtonItem: (UIBarButtonItem, Bool) -> UIBarButtonItem = {
-            [unowned self] barButtonItem, isLoading in
+            [weak self] barButtonItem, isLoading in
+            guard let weakSelf = self else {
+                return barButtonItem
+            }
             switch barButtonItem {
-            case self.reloadBarButtonItem:
+            case weakSelf.reloadBarButtonItem:
                 fallthrough
-            case self.stopBarButtonItem:
-                    return isLoading ? self.stopBarButtonItem : self.reloadBarButtonItem
+            case weakSelf.stopBarButtonItem:
+                    return isLoading ? weakSelf.stopBarButtonItem : weakSelf.reloadBarButtonItem
             default:
                 break
             }
