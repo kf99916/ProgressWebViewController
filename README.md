@@ -27,7 +27,7 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 
 ## Requirements
 
-- iOS 12.0+
+- iOS 13.0+
 
 ## Installation
 

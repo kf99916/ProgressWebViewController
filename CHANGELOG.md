@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 4.0.0
+
+- The min support iOS version is 13.
+- Refactor cookie management with `WKWebsiteDataStore`.
+- Update performance for multiple web views use case by sharing the same process pool.
+
 ## Version 3.2.0
 
 - Support JavaScript alert panel, confirm panel, and text input panel
