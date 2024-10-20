@@ -367,7 +367,7 @@ public extension ProgressWebViewController {
         
         var offsetY: CGFloat = 0
         if let currentNavigationController = currentNavigationController {
-            offsetY -= currentNavigationController.navigationBar.frame.size.height + UIApplication.shared.statusBarFrame.height
+            offsetY -= currentNavigationController.navigationBar.frame.size.height + (view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0)
         }
         if refresh, pullToRefresh {
             offsetY -= refreshControl.frame.size.height
@@ -665,7 +665,8 @@ fileprivate extension ProgressWebViewController {
     func openURLWithApp(_ url: URL) -> Bool {
         let application = UIApplication.shared
         if application.canOpenURL(url) {
-            return application.openURL(url)
+            application.open(url)
+            return true
         }
         
         return false
