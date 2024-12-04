@@ -92,6 +92,7 @@ open class ProgressWebViewController: UIViewController {
     fileprivate var scrollToRefresh = false
     fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
     fileprivate var isReloadWhenAppear = false
+    fileprivate var actionPolicy: WKNavigationActionPolicy = .allow
     fileprivate var estimatedProgress = 0.0 {
         didSet {
             if currentNavigationController?.isNavigationBarHidden ?? true, activityIndicatorView.isDescendant(of: view) {
@@ -274,8 +275,10 @@ open class ProgressWebViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         if estimatedProgress < 1 {
-            isReloadWhenAppear = true
-            webView?.stopLoading()
+            isReloadWhenAppear = actionPolicy == .allow
+            if isReloadWhenAppear {
+                webView?.stopLoading()
+            }
         }
         rollbackState()
     }
@@ -769,7 +772,7 @@ extension ProgressWebViewController: WKNavigationDelegate {
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        var actionPolicy: WKNavigationActionPolicy = .allow
+        actionPolicy = .allow
         defer {
             decisionHandler(actionPolicy)
         }
