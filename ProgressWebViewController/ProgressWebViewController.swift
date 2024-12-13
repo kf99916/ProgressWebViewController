@@ -86,8 +86,8 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView?
     
-    fileprivate var previousNavigationBarState: (tintColor: UIColor?, hidden: Bool) = (nil, false)
-    fileprivate var previousToolbarState: (tintColor: UIColor?, hidden: Bool) = (nil, true)
+    fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool)? = nil
+    fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool)? = nil
     
     fileprivate var scrollToRefresh = false
     fileprivate var lastTapPosition = CGPoint(x: 0, y: 0)
@@ -225,11 +225,6 @@ open class ProgressWebViewController: UIViewController {
         // Do any additional setup after loading the view.
         navigationItem.title = navigationItem.title ?? defaultURL?.absoluteString
         
-        if let currentNavigationController = currentNavigationController {
-            previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.navigationBar.isHidden)
-            previousToolbarState = (currentNavigationController.toolbar.tintColor, currentNavigationController.toolbar.isHidden)
-        }
-        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(webViewDidTap(sender:)))
         tapGesture.delegate = self
         webView?.addGestureRecognizer(tapGesture)
@@ -265,7 +260,9 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        setUpState()
+        if parent == nil {
+            setUpState()
+        }
         if isReloadWhenAppear {
             reload()
         }
@@ -280,7 +277,9 @@ open class ProgressWebViewController: UIViewController {
                 webView?.stopLoading()
             }
         }
-        rollbackState()
+        if parent == nil {
+            rollbackState(animated)
+        }
     }
 
     override open func didReceiveMemoryWarning() {
@@ -609,20 +608,24 @@ fileprivate extension ProgressWebViewController {
         else if let navigationBar = currentNavigationController?.navigationBar, !progressView.isDescendant(of: navigationBar) {
             navigationBar.addSubview(progressView)
         }
+        
+        if let currentNavigationController = currentNavigationController {
+            previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.navigationBar.isHidden)
+            previousToolbarState = (currentNavigationController.toolbar.tintColor, currentNavigationController.toolbar.isHidden)
+        }
     }
     
-    func rollbackState() {
+    func rollbackState(_ animated: Bool) {
         progressView.removeFromSuperview()
     
-        if let tintColor = previousNavigationBarState.tintColor {
-            currentNavigationController?.navigationBar.tintColor = tintColor
+        if let previousNavigationBarState = previousNavigationBarState {
+            currentNavigationController?.navigationBar.tintColor = previousNavigationBarState.tintColor
+            currentNavigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: animated)
         }
-        if let tintColor = previousToolbarState.tintColor {
-            currentNavigationController?.toolbar.tintColor = tintColor
+        if let previousToolbarState = previousToolbarState {
+            currentNavigationController?.toolbar.tintColor = previousToolbarState.tintColor
+            currentNavigationController?.setToolbarHidden(previousToolbarState.hidden, animated: animated)
         }
-        
-        currentNavigationController?.setToolbarHidden(previousToolbarState.hidden, animated: true)
-        currentNavigationController?.setNavigationBarHidden(previousNavigationBarState.hidden, animated: true)
     }
     
     func openURLWithApp(_ url: URL) -> Bool {
