@@ -260,7 +260,7 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if parent == nil {
+        if parent == nil || parent is UINavigationController {
             setUpState()
         }
         if isReloadWhenAppear {
