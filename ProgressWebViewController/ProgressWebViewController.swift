@@ -260,9 +260,7 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if currentNavigationController != nil {
-            setUpState()
-        }
+        setUpState()
         if isReloadWhenAppear {
             reload()
         }
@@ -277,9 +275,7 @@ open class ProgressWebViewController: UIViewController {
                 webView?.stopLoading()
             }
         }
-        if currentNavigationController != nil {
-            rollbackState(animated)
-        }
+        rollbackState(animated)
     }
 
     override open func didReceiveMemoryWarning() {
@@ -583,17 +579,6 @@ fileprivate extension ProgressWebViewController {
     }
     
     func setUpState() {
-        var numNavigationItems = 0
-        if let leftBarButtonItems = navigationItem.leftBarButtonItems {
-            numNavigationItems += leftBarButtonItems.count
-        }
-        if let rightBarButtonItems = navigationItem.rightBarButtonItems {
-            numNavigationItems += rightBarButtonItems.count
-        }
-        if currentNavigationController?.viewControllers.count ?? 1 > 1 {
-            numNavigationItems += 1
-        }
-    
         if let tintColor = tintColor {
             progressView.progressTintColor = tintColor
             currentNavigationController?.navigationBar.tintColor = tintColor
