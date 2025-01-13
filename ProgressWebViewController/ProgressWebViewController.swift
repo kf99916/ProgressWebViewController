@@ -260,7 +260,7 @@ open class ProgressWebViewController: UIViewController {
     override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if parent == nil || parent is UINavigationController {
+        if currentNavigationController != nil {
             setUpState()
         }
         if isReloadWhenAppear {
@@ -277,7 +277,7 @@ open class ProgressWebViewController: UIViewController {
                 webView?.stopLoading()
             }
         }
-        if parent == nil {
+        if currentNavigationController != nil {
             rollbackState(animated)
         }
     }
@@ -435,7 +435,7 @@ public extension ProgressWebViewController {
     func pushWebViewController(defaultURL: URL) {
         let progressWebViewController = delegate?.initPushedProgressWebViewController?(defaultURL: defaultURL) ?? ProgressWebViewController(self)
         progressWebViewController.defaultURL = defaultURL
-        show(progressWebViewController, sender: self)
+        currentNavigationController?.show(progressWebViewController, sender: self)
         setUpState()
     }
     
@@ -446,7 +446,7 @@ public extension ProgressWebViewController {
 // MARK: - Fileprivate Methods
 fileprivate extension ProgressWebViewController {
     var currentNavigationController: UINavigationController? {
-        return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController
+        return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController ?? UIViewController.currentNavigationController
     }
     
     func createWebView(webConfiguration: WKWebViewConfiguration) -> WKWebView {

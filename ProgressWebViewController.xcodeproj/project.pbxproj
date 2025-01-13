@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		35B9D9292D3530D000BA0C85 /* UIViewController+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */; };
+		35B9D92B2D3530F400BA0C85 /* UIWindow+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */; };
 		AA28A1B31F91C84600B67E53 /* ProgressWebViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA28A1C01F91C86700B67E53 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1BF1F91C86700B67E53 /* AppDelegate.swift */; };
 		AA28A1C21F91C86700B67E53 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1C11F91C86700B67E53 /* ViewController.swift */; };
@@ -36,6 +38,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Helpers.swift"; sourceTree = "<group>"; };
+		35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+Helpers.swift"; sourceTree = "<group>"; };
 		AA28A1AE1F91C84600B67E53 /* ProgressWebViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProgressWebViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressWebViewController.h; sourceTree = "<group>"; };
 		AA28A1B21F91C84600B67E53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -72,6 +76,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		35B9D9272D3530AE00BA0C85 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */,
+				35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		AA28A1A41F91C84500B67E53 = {
 			isa = PBXGroup;
 			children = (
@@ -94,6 +107,7 @@
 		AA28A1B01F91C84600B67E53 /* ProgressWebViewController */ = {
 			isa = PBXGroup;
 			children = (
+				35B9D9272D3530AE00BA0C85 /* Extensions */,
 				AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */,
 				AA28A1B21F91C84600B67E53 /* Info.plist */,
 				AA28A1CF1F91C87D00B67E53 /* ProgressWebViewController.swift */,
@@ -241,6 +255,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA28A1D81F91ED7C00B67E53 /* Enums.swift in Sources */,
+				35B9D92B2D3530F400BA0C85 /* UIWindow+Helpers.swift in Sources */,
+				35B9D9292D3530D000BA0C85 /* UIViewController+Helpers.swift in Sources */,
 				AA28A1D01F91C87D00B67E53 /* ProgressWebViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
