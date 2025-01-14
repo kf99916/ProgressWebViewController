@@ -579,6 +579,11 @@ fileprivate extension ProgressWebViewController {
     }
     
     func setUpState() {
+        if let currentNavigationController = currentNavigationController {
+            previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.isNavigationBarHidden)
+            previousToolbarState = (currentNavigationController.toolbar.tintColor, currentNavigationController.isToolbarHidden)
+        }
+        
         if let tintColor = tintColor {
             progressView.progressTintColor = tintColor
             currentNavigationController?.navigationBar.tintColor = tintColor
@@ -592,11 +597,6 @@ fileprivate extension ProgressWebViewController {
         }
         else if let navigationBar = currentNavigationController?.navigationBar, !progressView.isDescendant(of: navigationBar) {
             navigationBar.addSubview(progressView)
-        }
-        
-        if let currentNavigationController = currentNavigationController {
-            previousNavigationBarState = (currentNavigationController.navigationBar.tintColor, currentNavigationController.navigationBar.isHidden)
-            previousToolbarState = (currentNavigationController.toolbar.tintColor, currentNavigationController.toolbar.isHidden)
         }
     }
     
