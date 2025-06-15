@@ -21,6 +21,8 @@ let cookieKey = "Cookie"
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, navigationType: NavigationType) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, decidePolicy url: URL, response: URLResponse) -> Bool
     @objc optional func progressWebViewController(_ controller: ProgressWebViewController, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView?
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, downloadDidFinish download: WKDownload, destination: URL)
+    @objc optional func progressWebViewController(_ controller: ProgressWebViewController, downloadDidFail download: WKDownload, error: Error) -> Bool
     @objc optional func initPushedProgressWebViewController(defaultURL: URL) -> ProgressWebViewController
 }
 
@@ -86,6 +88,8 @@ open class ProgressWebViewController: UIViewController {
     
     fileprivate var webView: WKWebView?
     
+    fileprivate var downloadingFileDestinations: [WKDownload: URL] = [:]
+    
     fileprivate var previousNavigationBarState: (tintColor: UIColor, hidden: Bool)? = nil
     fileprivate var previousToolbarState: (tintColor: UIColor, hidden: Bool)? = nil
     
@@ -126,15 +130,9 @@ open class ProgressWebViewController: UIViewController {
     }()
     
     lazy fileprivate var activityIndicatorView: UIActivityIndicatorView = {
-        if #available(iOS 13.0, *) {
-            let activityIndicatorView = UIActivityIndicatorView(style: .medium)
-            activityIndicatorView.color = tintColor ?? .label
-            return activityIndicatorView
-        } else {
-            let activityIndicatorView = UIActivityIndicatorView(style: .gray)
-            activityIndicatorView.color = tintColor ?? .darkText
-            return activityIndicatorView
-        }
+        let activityIndicatorView = UIActivityIndicatorView(style: .medium)
+        activityIndicatorView.color = tintColor ?? .label
+        return activityIndicatorView
     }()
     
     lazy fileprivate var refreshControl: UIRefreshControl = {
@@ -378,9 +376,7 @@ public extension ProgressWebViewController {
     
     func clearCache(completionHandler: @escaping () -> Void) {
         var websiteDataTypes = Set<String>([WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeOfflineWebApplicationCache])
-        if #available(iOS 11.3, *) {
-            websiteDataTypes.insert(WKWebsiteDataTypeFetchCache)
-        }
+        websiteDataTypes.insert(WKWebsiteDataTypeFetchCache)
         WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes, modifiedSince: Date(timeIntervalSince1970: 0), completionHandler: completionHandler)
     }
     
@@ -447,9 +443,7 @@ fileprivate extension ProgressWebViewController {
     
     func createWebView(webConfiguration: WKWebViewConfiguration) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: webConfiguration)
-        if #available(iOS 13.0, *) {
-            webView.backgroundColor = .systemBackground
-        }
+        webView.backgroundColor = .systemBackground
         
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -764,7 +758,11 @@ extension ProgressWebViewController: WKNavigationDelegate {
         defer {
             decisionHandler(actionPolicy)
         }
-        guard let url = navigationAction.request.url, !url.isFileURL else {
+        guard let url = navigationAction.request.url else {
+            return
+        }
+        if navigationAction.shouldPerformDownload {
+            actionPolicy = .download
             return
         }
         
@@ -815,7 +813,12 @@ extension ProgressWebViewController: WKNavigationDelegate {
         defer {
             decisionHandler(responsePolicy)
         }
-        guard let url = navigationResponse.response.url, !url.isFileURL else {
+        guard let url = navigationResponse.response.url else {
+            return
+        }
+        
+        if !navigationResponse.canShowMIMEType {
+            responsePolicy = .download
             return
         }
         
@@ -835,6 +838,38 @@ extension ProgressWebViewController: WKNavigationDelegate {
         else {
             isReloadWhenAppear = true
         }
+    }
+    
+    public func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload) {
+        download.delegate = self
+    }
+    
+    public func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        download.delegate = self
+    }
+}
+
+extension ProgressWebViewController: WKDownloadDelegate {
+    public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String) async -> URL? {
+        let destination = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(suggestedFilename)
+        downloadingFileDestinations[download] = destination
+        return destination
+    }
+    
+    public func downloadDidFinish(_ download: WKDownload) {
+        guard let destination = downloadingFileDestinations[download] else {
+            return
+        }
+        delegate?.progressWebViewController?(self, downloadDidFinish: download, destination: destination)
+        downloadingFileDestinations.removeValue(forKey: download)
+    }
+
+    public func download(_ download: WKDownload, didFailWithError error: any Error, resumeData: Data?) {
+        guard delegate?.progressWebViewController?(self, downloadDidFail: download, error: error) ?? false, let resumeData = resumeData else {
+            downloadingFileDestinations.removeValue(forKey: download)
+            return
+        }
+        webView?.resumeDownload(fromResumeData: resumeData) {_ in }
     }
 }
 
