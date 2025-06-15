@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 5.0.0
+
+- The min support iOS version is 14.5.
+- Support download files with WKDownloadDelegate.
+- Fix bugs.
+
 ## Version 4.0.0
 
 - The min support iOS version is 13.

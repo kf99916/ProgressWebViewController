@@ -24,10 +24,11 @@ A WebViewController implemented by WKWebView with a progress bar in the navigati
 - :white_check_mark: Open the special urls including the app store, tel, mailto, sms, and \_blank with other apps
 - :white_check_mark: Support the pull-to-refresh
 - :white_check_mark: Support the push navigation way
+- - :white_check_mark: Support download files including Blob urls
 
 ## Requirements
 
-- iOS 13.0+
+- iOS 14.5+
 
 ## Installation
 
