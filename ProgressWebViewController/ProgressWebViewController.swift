@@ -858,7 +858,7 @@ extension ProgressWebViewController: WKDownloadDelegate {
         if !fileExtension.isEmpty {
             filename = "\(filename).\(fileExtension)"
         }
-        let destination = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).appendingPathComponent(filename)
+        let destination = FileManager.default.temporaryDirectory.appendingPathComponent(filename)
         downloadingFileDestinations[download] = destination
         return destination
     }
