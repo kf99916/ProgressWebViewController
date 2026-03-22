@@ -111,11 +111,10 @@ open class ProgressWebViewController: UIViewController {
                 progressView.setProgress(Float(estimatedProgress), animated: true)
                 
                 if estimatedProgress >= 1.0 {
-                    UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: {
-                        self.progressView.alpha = 0
-                    }, completion: {
-                        finished in
-                        self.progressView.setProgress(0, animated: false)
+                    UIView.animate(withDuration: 0.3, delay: 0.3, options: .curveEaseOut, animations: { [weak self] in
+                        self?.progressView.alpha = 0
+                    }, completion: { [weak self] finished in
+                        self?.progressView.setProgress(0, animated: false)
                     })
                 }
             }
