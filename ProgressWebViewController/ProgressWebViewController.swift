@@ -318,10 +318,23 @@ public extension ProgressWebViewController {
     func load(_ url: URL) {
         isReloadWhenAppear = false
         if isViewLoaded {
-            let request = createRequest(url: url)
-            DispatchQueue.main.async {
-                self.webView?.stopLoading()
-                self.webView?.load(request)
+            var request = createRequest(url: url)
+            // 1. Prepare the header injection (Backup)
+            if let cookies = HTTPCookieStorage.shared.cookies(for: url) {
+                let headers = HTTPCookie.requestHeaderFields(with: cookies)
+                request.allHTTPHeaderFields = headers
+            }
+            
+            Task {
+                // 2. Wait for the sync to the internal WKHTTPCookieStore (Primary)
+                // This ensures that when the redirect happens, the cookie is ALREADY in the store
+                await bridgeCookies()
+                
+                // 3. Load the request on the Main Thread
+                await MainActor.run {
+                    self.webView?.stopLoading()
+                    self.webView?.load(request)
+                }
             }
         }
         else {
@@ -331,7 +344,7 @@ public extension ProgressWebViewController {
     
     func load(htmlString: String, baseURL: URL?) {
         isReloadWhenAppear = false
-        DispatchQueue.main.async {
+        Task { @MainActor in
             self.webView?.stopLoading()
             self.webView?.loadHTMLString(htmlString, baseURL: baseURL)
         }
@@ -409,17 +422,13 @@ public extension ProgressWebViewController {
         }
     }
     
-    func updateHttpCookies(cookies: [HTTPCookie]) async {
-        let currentCookies = await webView?.configuration.websiteDataStore.httpCookieStore.allCookies()
-        var shouldReload = false
-        for cookie in cookies {
-            if !(currentCookies?.contains(cookie) ?? false) {
-                shouldReload = true
-                await webView?.configuration.websiteDataStore.httpCookieStore.setCookie(cookie)
-            }
-        }
-        if shouldReload {
-            reload()
+    @MainActor
+    func bridgeCookies() async {
+        let nativeCookies = HTTPCookieStorage.shared.cookies ?? []
+        let webStore = webView?.configuration.websiteDataStore.httpCookieStore
+        
+        for cookie in nativeCookies {
+            await webStore?.setCookie(cookie)
         }
     }
     
