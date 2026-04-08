@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 5.0.1
+
+- Bridge cookies from HTTPCookieStorage to web view's ttpCookieStore correctly.
+- Ensure the downloaded filename is unique.
+- Fix closure capture self issue.
+
 ## Version 5.0.0
 
 - The min support iOS version is 14.5.
