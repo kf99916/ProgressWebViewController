@@ -263,6 +263,16 @@ open class ProgressWebViewController: UIViewController {
         }
     }
     
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        // Recalculate view's hierarchy to avoid content in web view is overlapped by tab bar
+        if tabBarController != nil && view.safeAreaInsets.bottom == 0 {
+            view.setNeedsLayout()
+            view.layoutIfNeeded()
+        }
+    }
+    
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         

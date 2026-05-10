@@ -53,19 +53,6 @@ class ViewController: UIViewController {
             progressWebViewController.defaultURL = url
             progressWebViewController.defaultHeaders = ["browser": "in-app browser"]
             progressWebViewController.tintColor = .red
-            Task {
-                await progressWebViewController.updateHttpCookies(cookies: [
-                    HTTPCookie(properties:
-                    [HTTPCookiePropertyKey.originURL: url.absoluteString,
-                     HTTPCookiePropertyKey.path: "/",
-                     HTTPCookiePropertyKey.name: "author",
-                     HTTPCookiePropertyKey.value: "Zheng-Xiang Ke"])!,
-                    HTTPCookie(properties:
-                    [HTTPCookiePropertyKey.originURL: url.absoluteString,
-                     HTTPCookiePropertyKey.path: "/",
-                     HTTPCookiePropertyKey.name: "GitHub",
-                     HTTPCookiePropertyKey.value: "kf99916"])!])
-            }
         default:
             print("Unknown segue \(identifier)")
         }
