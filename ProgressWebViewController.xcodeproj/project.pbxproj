@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		35B9D9292D3530D000BA0C85 /* UIViewController+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */; };
-		35B9D92B2D3530F400BA0C85 /* UIWindow+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */; };
 		AA28A1B31F91C84600B67E53 /* ProgressWebViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AA28A1C01F91C86700B67E53 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1BF1F91C86700B67E53 /* AppDelegate.swift */; };
 		AA28A1C21F91C86700B67E53 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1C11F91C86700B67E53 /* ViewController.swift */; };
@@ -21,6 +20,7 @@
 		AA28A1D61F91E1A200B67E53 /* ProgressWebViewController.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = AA28A1AE1F91C84600B67E53 /* ProgressWebViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		AA28A1D81F91ED7C00B67E53 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA28A1D71F91ED7C00B67E53 /* Enums.swift */; };
 		AA28A1DA1F91FF7A00B67E53 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA28A1D91F91FF7A00B67E53 /* Media.xcassets */; };
+		AAB6F850305E6E7700717EDC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB6F84F305E6E7700717EDC /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,7 +39,6 @@
 
 /* Begin PBXFileReference section */
 		35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Helpers.swift"; sourceTree = "<group>"; };
-		35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIWindow+Helpers.swift"; sourceTree = "<group>"; };
 		AA28A1AE1F91C84600B67E53 /* ProgressWebViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ProgressWebViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA28A1B11F91C84600B67E53 /* ProgressWebViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressWebViewController.h; sourceTree = "<group>"; };
 		AA28A1B21F91C84600B67E53 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -54,6 +53,7 @@
 		AA28A1D21F91C89D00B67E53 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		AA28A1D71F91ED7C00B67E53 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		AA28A1D91F91FF7A00B67E53 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		AAB6F84F305E6E7700717EDC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +80,6 @@
 			isa = PBXGroup;
 			children = (
 				35B9D9282D3530D000BA0C85 /* UIViewController+Helpers.swift */,
-				35B9D92A2D3530F400BA0C85 /* UIWindow+Helpers.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -120,12 +119,13 @@
 		AA28A1BE1F91C86700B67E53 /* ProgressWebViewControllerDemo */ = {
 			isa = PBXGroup;
 			children = (
+				AA28A1CB1F91C86700B67E53 /* Info.plist */,
 				AA28A1BF1F91C86700B67E53 /* AppDelegate.swift */,
+				AAB6F84F305E6E7700717EDC /* SceneDelegate.swift */,
 				AA28A1C11F91C86700B67E53 /* ViewController.swift */,
-				AA28A1C31F91C86700B67E53 /* Main.storyboard */,
 				AA28A1C61F91C86700B67E53 /* Assets.xcassets */,
 				AA28A1C81F91C86700B67E53 /* LaunchScreen.storyboard */,
-				AA28A1CB1F91C86700B67E53 /* Info.plist */,
+				AA28A1C31F91C86700B67E53 /* Main.storyboard */,
 			);
 			path = ProgressWebViewControllerDemo;
 			sourceTree = "<group>";
@@ -255,7 +255,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA28A1D81F91ED7C00B67E53 /* Enums.swift in Sources */,
-				35B9D92B2D3530F400BA0C85 /* UIWindow+Helpers.swift in Sources */,
 				35B9D9292D3530D000BA0C85 /* UIViewController+Helpers.swift in Sources */,
 				AA28A1D01F91C87D00B67E53 /* ProgressWebViewController.swift in Sources */,
 			);
@@ -267,6 +266,7 @@
 			files = (
 				AA28A1C21F91C86700B67E53 /* ViewController.swift in Sources */,
 				AA28A1C01F91C86700B67E53 /* AppDelegate.swift in Sources */,
+				AAB6F850305E6E7700717EDC /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,7 +344,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -401,7 +401,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
