@@ -456,7 +456,7 @@ public extension ProgressWebViewController {
 // MARK: - Fileprivate Methods
 fileprivate extension ProgressWebViewController {
     var currentNavigationController: UINavigationController? {
-        return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController ?? UIViewController.currentNavigationController
+        return navigationController ?? parent?.navigationController ?? parent?.presentingViewController?.navigationController ?? UIViewController.navigationController(in: viewIfLoaded?.window)
     }
     
     func createWebView(webConfiguration: WKWebViewConfiguration) -> WKWebView {

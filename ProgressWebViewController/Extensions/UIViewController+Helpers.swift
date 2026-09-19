@@ -9,8 +9,8 @@
 import UIKit
 
 extension UIViewController {
-    static var currentNavigationController: UINavigationController? {
-        guard var currentViewController = UIWindow.key?.rootViewController else{
+    static func navigationController(in window: UIWindow?) -> UINavigationController? {
+        guard var currentViewController = window?.rootViewController else {
             return nil
         }
         
